@@ -6,8 +6,10 @@ import java.util.Timer;
 public class Visualizer {
 
 	private static Hashtable<Long,Thread> threadTable = new Hashtable<Long, Thread>();
-	private  static Hashtable<Long,ArrayList<ActivitySlice>> activityTable = new Hashtable<Long, ArrayList<ActivitySlice>>();
+	private static Hashtable<Long,ArrayList<ActivitySlice>> activityTable = new Hashtable<Long, ArrayList<ActivitySlice>>();
 	
+	private static ArrayList<SystemSlice> systemList = new ArrayList<SystemSlice>();
+
 	//threads currently active
 	private static long activeThreads = 0; 
 	//all threads created ever
@@ -55,6 +57,11 @@ public class Visualizer {
 		temp.add(as);
 		//save it
 		activityTable.put(num, temp);
+	}
+
+	public static void addSystemSlice(SystemSlice ss)
+	{
+		systemList.add(ss);
 	}
 	
 	public synchronized static void printAll()

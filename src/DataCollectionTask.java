@@ -6,13 +6,17 @@
 
 
 import java.util.TimerTask;
+import java.util.Random;
 
 public class DataCollectionTask extends TimerTask {
 
 	@Override
 	public void run() {
+
+		Random rng = new Random();
 			
-		//collect data and send it to Visualizer
+		//create dummy data
+		Visualizer.addSystemSlice(new SystemSlice(rng.nextInt(100), rng.nextInt(1024), System.currentTimeMillis()));
 
 	}
 
