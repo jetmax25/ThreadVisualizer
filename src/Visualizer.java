@@ -1,5 +1,6 @@
 import java.util.ArrayList;
 import java.util.Hashtable;
+import java.util.Timer;
 
 
 public class Visualizer {
@@ -15,6 +16,13 @@ public class Visualizer {
 	private static long maxThreads  = 0; 
 	private static long start = System.currentTimeMillis(); 
 	
+	//rate at which the Visualizer logs CPU/Memory Usage, watched variables, etc.
+	private static int tickRate = 500;
+
+	//kicks off our data collection at every tickRate interval
+	private static Timer collectionTimer = new Timer();
+	private static boolean timerStarted = false;
+	
 	//Threads will call this method to add themselves to the ArrayList
 	public static void addThread(Thread th)
 	{
@@ -24,6 +32,7 @@ public class Visualizer {
 		
 		if(activeThreads > maxThreads) maxThreads++; 
 		totalThreads++;
+		
 	}
 	
 	public static void removeThreads(Thread th)
@@ -59,6 +68,28 @@ public class Visualizer {
 	public static long threadCount()
 	{
 		return activeThreads;
+	}
+	
+	public static void setTickRate(int rateInMS)
+	{
+		tickRate = rateInMS;
+	}
+	
+	public static void startDataCollection()
+	{
+		//if already started, cancel the tasks and restart (possibly at new rate)
+		if(timerStarted)
+		{
+			stopDataCollection();
+		}
+
+		collectionTimer.scheduleAtFixedRate(new DataCollectionTask(), 0, tickRate);
+	}
+
+	public static void stopDataCollection()
+	{
+		collectionTimer.cancel();
+		collectionTimer.purge();
 	}
 
 }

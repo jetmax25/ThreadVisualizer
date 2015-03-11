@@ -83,18 +83,18 @@ public class VisualThread extends Thread{
 
 	@Override
 	public void run() {
-//		boolean x = true;
-//		while(x){
-//			// TODO Auto-generated method stub
-//			try {
-//				Thread.sleep(100 * id);
-//			} catch (InterruptedException e) {
-//				// TODO Auto-generated catch block
-//				x = false;
-//	
-//			}
+		boolean x = true;
+		while(x){
+			// TODO Auto-generated method stub
+			try {
+				Thread.sleep(100 * id);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				x = false;
+	
+			}
 			this.addSlice("run()");
-//		}
+		}
 		
 	}
 
