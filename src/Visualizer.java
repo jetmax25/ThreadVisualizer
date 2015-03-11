@@ -23,6 +23,8 @@ public class Visualizer {
 	private static Timer collectionTimer = new Timer();
 	private static boolean timerStarted = false;
 	
+	private static VisualGUI gui = new VisualGUI();	
+	
 	//Threads will call this method to add themselves to the ArrayList
 	public static void addThread(Thread th)
 	{

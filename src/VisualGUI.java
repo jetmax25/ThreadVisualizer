@@ -81,8 +81,7 @@ public class VisualGUI {
 					//Adding components to JFrame using GridBagLayout manager
 					JFrame jframe = new JFrame("Concurrent Visualizer");
 					jframe.setLayout(new GridBagLayout());
-					jframe.setResizable(true);
-					jframe.setMinimumSize(new Dimension(1000, 800));
+					jframe.setResizable(false);
 					jframe.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 					
 					GridBagConstraints gc = new GridBagConstraints();
