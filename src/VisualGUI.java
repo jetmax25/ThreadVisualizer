@@ -25,7 +25,7 @@ public class VisualGUI {
 
 					// create a chart...
 					JFreeChart chart = ChartFactory.createLineChart("CPU Usage", "Time", "Hz", data, PlotOrientation.VERTICAL, true, true, false);
-					// create and display a frame...
+					// create a panel to put the chart in
 					ChartPanel chartPanel = new ChartPanel(chart);
 					chartPanel.setVisible(true);
 						
@@ -68,7 +68,7 @@ public class VisualGUI {
 					jpanel1.setVisible(true);
 					
 					
-					//adding JFreeChart to JPanel2
+					//adding the chartPanel with the JFreeChart inside to JPanel2
 					jpanel2.add(chartPanel);
 					jpanel2.setVisible(true);
 					
