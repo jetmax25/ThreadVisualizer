@@ -26,11 +26,16 @@ public class VisualGUI {
 	
 	XYSeriesCollection dataset;
 	JFreeChart chart;
+	JFreeChart chart2;
 	ChartPanel chartPanel;
+	ChartPanel chartPanel2;
 	XYSeries[] seriesArray;
 	JCheckBox[] checkboxes;
 	JFrame jframe;
 	GridBagConstraints gc;
+	JPanel jpanel1;
+	JPanel jpanel2;
+	JPanel jpanel3;
 	
 	public VisualGUI(){
 		// create a dataset...
@@ -38,6 +43,9 @@ public class VisualGUI {
 
 					// create a chart...
 					chart = ChartFactory.createXYLineChart("CPU Usage", "Time", "Percentage", dataset, PlotOrientation.VERTICAL, true, true, false);
+					
+					chart2 = ChartFactory.createXYLineChart("Memory Usage", "Time", "Percentage", dataset, PlotOrientation.VERTICAL, true, true, false);
+					
 					// create a panel to put the chart in
 					chartPanel = new ChartPanel(chart);
 					
@@ -64,16 +72,40 @@ public class VisualGUI {
 					button3.setMaximumSize(new Dimension(200, 200));
 					button4.setMaximumSize(new Dimension(200, 200));
 					
+					//add action listeners to each button
+					button1.addActionListener(new ActionListener(){
+						public void actionPerformed(ActionEvent e){
+							chartPanel = new ChartPanel(chart);
+							jpanel2.removeAll();
+							jpanel2.add(chartPanel);
+							jpanel2.revalidate();
+							jpanel2.repaint();
+						}
+					});
+					
+					
+					
+					
+					button2.addActionListener(new ActionListener(){
+						public void actionPerformed(ActionEvent e){
+							chartPanel2 = new ChartPanel(chart2);
+							jpanel2.removeAll();
+							jpanel2.add(chartPanel2);
+							jpanel2.revalidate();
+							jpanel2.repaint();
+						}
+					});
+					
 					
 					
 					
 					
 					//creating JPanels
-					JPanel jpanel1 = new JPanel();
+					jpanel1 = new JPanel();
 					jpanel1.setLayout(new BoxLayout(jpanel1, BoxLayout.Y_AXIS));
 					
-					JPanel jpanel2 = new JPanel();
-					JPanel jpanel3 = new JPanel();			
+					jpanel2 = new JPanel();
+					jpanel3 = new JPanel();			
 					
 					//adding buttons to JPanel1
 					jpanel1.add(button1);
@@ -153,20 +185,26 @@ public class VisualGUI {
 					jframe.setVisible(true);
 					
 					
-					
-					
-					
-					int counter = 0;
-					while(counter < 100){
-						for(i=0; i<seriesArray.length; i++){
-							seriesArray[i].add(counter, returnRandom());
-						}
-						counter++;
-						try{Thread.sleep(1000);}
-						catch(InterruptedException e){
+					Thread thread = new Thread(new Runnable(){
+						public void run(){
+							int counter = 0;
+							int i;
+							while(counter < 100){
+								for(i=0; i<seriesArray.length; i++){
+									seriesArray[i].add(counter, returnRandom());
+								}
+								counter++;
+								try{Thread.sleep(1000);}
+								catch(InterruptedException e){
 
+								}
+							}
 						}
-					}
+					});
+					thread.run();
+					
+					
+					
 					
 					
 	}
@@ -178,7 +216,7 @@ public class VisualGUI {
 	}
 	
 	public static int getNumberOfThreads(){
-		return 3;
+		return 6;
 	}
 	
 	public void removeSeries(String string){		
