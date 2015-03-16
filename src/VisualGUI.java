@@ -27,6 +27,7 @@ public class VisualGUI {
 	XYSeriesCollection dataset;
 	JFreeChart chart;
 	JFreeChart chart2;
+	JFreeChart currChart;
 	ChartPanel chartPanel;
 	ChartPanel chartPanel2;
 	XYSeries[] seriesArray;
@@ -43,6 +44,7 @@ public class VisualGUI {
 
 					// create a chart...
 					chart = ChartFactory.createXYLineChart("CPU Usage", "Time", "Percentage", dataset, PlotOrientation.VERTICAL, true, true, false);
+					currChart = chart;
 					
 					chart2 = ChartFactory.createXYLineChart("Memory Usage", "Time", "Percentage", dataset, PlotOrientation.VERTICAL, true, true, false);
 					
@@ -80,6 +82,7 @@ public class VisualGUI {
 							jpanel2.add(chartPanel);
 							jpanel2.revalidate();
 							jpanel2.repaint();
+							currChart = chart;
 						}
 					});
 					
@@ -93,6 +96,21 @@ public class VisualGUI {
 							jpanel2.add(chartPanel2);
 							jpanel2.revalidate();
 							jpanel2.repaint();
+							currChart = chart2;
+						}
+					});
+					
+					
+					button3.addActionListener(new ActionListener(){
+						public void actionPerformed(ActionEvent e){
+							//add code here
+						}
+					});
+					
+					
+					button4.addActionListener(new ActionListener(){
+						public void actionPerformed(ActionEvent e){
+							//add code here
 						}
 					});
 					
@@ -227,7 +245,7 @@ public class VisualGUI {
 		while(i<100){
 			if(string.endsWith(Integer.toString(i))){
 				//dataset.removeSeries(0);
-				XYPlot plot = (XYPlot) chart.getPlot();
+				XYPlot plot = (XYPlot) currChart.getPlot();
 				XYItemRenderer renderer = plot.getRenderer();
 				renderer.setSeriesVisible(i-1, false);
 				
@@ -245,7 +263,7 @@ public class VisualGUI {
 		while(i<100){
 			if(string.endsWith(Integer.toString(i))){
 				//dataset.removeSeries(0);
-				XYPlot plot = (XYPlot) chart.getPlot();
+				XYPlot plot = (XYPlot) currChart.getPlot();
 				XYItemRenderer renderer = plot.getRenderer();
 				renderer.setSeriesVisible(i-1, true);
 				
