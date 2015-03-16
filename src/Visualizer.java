@@ -11,11 +11,11 @@ public class Visualizer {
 	//accepting thread table
 	private static Hashtable<Long,Long> acceptingTable = new Hashtable<Long, Long>();
 	//threads currently active
-	private static long activeThreads = 0; 
+	private static int activeThreads = 0; 
 	//all threads created ever
-	private static long totalThreads = 0; 
+	private static int totalThreads = 0; 
 	//most threads ever active
-	private static long maxThreads  = 0; 
+	private static int maxThreads  = 0; 
 	private static long start = System.currentTimeMillis(); 
 	
 	//rate at which the Visualizer logs CPU/Memory Usage, watched variables, etc.
@@ -125,5 +125,13 @@ public class Visualizer {
 		if(acceptingTable.get(id) != null) return true; 
 		return false; 
 	}
+	
+	public static int getTotalThreads()
+	{
+		return totalThreads;
+	}
+
+
+	
 
 }
