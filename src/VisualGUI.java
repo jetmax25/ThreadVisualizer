@@ -2,50 +2,69 @@ import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.Random;
 
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JFrame;
-import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.plot.PlotOrientation;
-import org.jfree.data.category.DefaultCategoryDataset;
+import org.jfree.chart.plot.XYPlot;
+import org.jfree.chart.renderer.xy.XYItemRenderer;
+import org.jfree.data.xy.XYSeries;
+import org.jfree.data.xy.XYSeriesCollection;
 
 
 public class VisualGUI {
 	
+	XYSeriesCollection dataset;
+	JFreeChart chart;
+	ChartPanel chartPanel;
+	XYSeries[] seriesArray;
+	JCheckBox[] checkboxes;
+	JFrame jframe;
+	GridBagConstraints gc;
+	
 	public VisualGUI(){
 		// create a dataset...
-					DefaultCategoryDataset data = new DefaultCategoryDataset();			
+					dataset = new XYSeriesCollection();			
 
 					// create a chart...
-					JFreeChart chart = ChartFactory.createLineChart("CPU Usage", "Time", "Hz", data, PlotOrientation.VERTICAL, true, true, false);
+					chart = ChartFactory.createXYLineChart("CPU Usage", "Time", "Percentage", dataset, PlotOrientation.VERTICAL, true, true, false);
 					// create a panel to put the chart in
-					ChartPanel chartPanel = new ChartPanel(chart);
+					chartPanel = new ChartPanel(chart);
+					
+					
+					seriesArray = new XYSeries[getNumberOfThreads()];
+					for(int i = 0; i<seriesArray.length; i++){
+						seriesArray[i] = new XYSeries("Thread" + Integer.toString(i+1));
+						dataset.addSeries(seriesArray[i]);
+					}
+					
+					
 					chartPanel.setVisible(true);
 						
 					
 					//creating JButtons for JPanel 1
 					JButton button1 = new JButton("CPU Visualizer");
 					JButton button2 = new JButton("Memory Visualizer");
-					JButton button3 = new JButton("Thread1 Visualizer");
-					JButton button4 = new JButton("Thread2 Visualizer");
-					JButton button5 = new JButton("Thread3 Visualizer");
-					JButton button6 = new JButton("Thread4 Visualizer");
-					JButton button7 = new JButton("Thread5 Visualizer");
+					JButton button3 = new JButton("Thread Sleep Time");
+					JButton button4 = new JButton("Thread Critical Sections");
+					
 								
 					button1.setMaximumSize(new Dimension(200, 200));
 					button2.setMaximumSize(new Dimension(200, 200));
 					button3.setMaximumSize(new Dimension(200, 200));
 					button4.setMaximumSize(new Dimension(200, 200));
-					button5.setMaximumSize(new Dimension(200, 200));
-					button6.setMaximumSize(new Dimension(200, 200));
-					button7.setMaximumSize(new Dimension(200, 200));
+					
+					
 					
 					
 					
@@ -61,9 +80,6 @@ public class VisualGUI {
 					jpanel1.add(button2);
 					jpanel1.add(button3);
 					jpanel1.add(button4);
-					jpanel1.add(button5);
-					jpanel1.add(button6);
-					jpanel1.add(button7);
 					
 					jpanel1.setVisible(true);
 					
@@ -72,19 +88,38 @@ public class VisualGUI {
 					jpanel2.add(chartPanel);
 					jpanel2.setVisible(true);
 					
-					//adding label to jpanel3
-					jpanel3.add(new JLabel("Lots of Data goes here"));
+					//adding checkboxes to jpanel3
+					int numThreads = getNumberOfThreads();
+					checkboxes = new JCheckBox[numThreads];
+					
+					int i;
+					for(i=0; i<numThreads; i++){
+						checkboxes[i] = new JCheckBox("Thread " + Integer.toString(i+1), true);
+						checkboxes[i].addActionListener(new ActionListener(){
+							public void actionPerformed(ActionEvent e){
+								//remove data series here
+								JCheckBox thisBox = (JCheckBox) e.getSource();
+								if(thisBox.isSelected() == false){
+									removeSeries(thisBox.getText());
+								}
+								else{
+									addSeries(thisBox.getText());
+								}
+							}
+						});
+						jpanel3.add(checkboxes[i]);
+					}
 					jpanel3.setVisible(true);
 					
 					
 					
 					//Adding components to JFrame using GridBagLayout manager
-					JFrame jframe = new JFrame("Concurrent Visualizer");
+					jframe = new JFrame("Concurrent Visualizer");
 					jframe.setLayout(new GridBagLayout());
 					jframe.setResizable(false);
 					jframe.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 					
-					GridBagConstraints gc = new GridBagConstraints();
+					gc = new GridBagConstraints();
 					gc.gridx = 0;
 					gc.gridy = 0;
 					gc.gridwidth = 1;
@@ -123,19 +158,63 @@ public class VisualGUI {
 					
 					int counter = 0;
 					while(counter < 100){
-						data.addValue(returnRandom(), "CPU Usage", Integer.toString(counter));
+						for(i=0; i<seriesArray.length; i++){
+							seriesArray[i].add(counter, returnRandom());
+						}
 						counter++;
 						try{Thread.sleep(1000);}
 						catch(InterruptedException e){
 
 						}
 					}
+					
+					
 	}
 	
 	public static int returnRandom(){
 		Random rn = new Random();
-		int answer = rn.nextInt(20) + 1;
+		int answer = rn.nextInt(100) + 1;
 		return answer;
+	}
+	
+	public static int getNumberOfThreads(){
+		return 3;
+	}
+	
+	public void removeSeries(String string){		
+		if(string == null)
+			return;
+		
+		int i=1;
+		while(i<100){
+			if(string.endsWith(Integer.toString(i))){
+				//dataset.removeSeries(0);
+				XYPlot plot = (XYPlot) chart.getPlot();
+				XYItemRenderer renderer = plot.getRenderer();
+				renderer.setSeriesVisible(i-1, false);
+				
+				return;
+			}
+			i++;
+		}
+	}
+	
+	public void addSeries(String string){		
+		if(string == null)
+			return;
+		
+		int i=1;
+		while(i<100){
+			if(string.endsWith(Integer.toString(i))){
+				//dataset.removeSeries(0);
+				XYPlot plot = (XYPlot) chart.getPlot();
+				XYItemRenderer renderer = plot.getRenderer();
+				renderer.setSeriesVisible(i-1, true);
+				
+				return;
+			}
+			i++;
+		}
 	}
 	
 }
