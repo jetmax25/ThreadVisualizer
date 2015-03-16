@@ -129,7 +129,7 @@ public class VisualThread extends Thread{
 	
 	public void addSlice(String s )
 	{
-		Visualizer.addSlice(new ActivitySlice(s, this.id, System.currentTimeMillis(), ObjectSizeFetcher.getObjectSize(this) ));
+		if(Visualizer.isAcceptingThread(this.id)) Visualizer.addSlice(new ActivitySlice(s, this.id, System.currentTimeMillis(), ObjectSizeFetcher.sizeOf(this) ));
 	}
 }
 
@@ -143,7 +143,7 @@ public class VisualThread extends Thread{
         instrumentation = inst;
     }
 
-    public static long getObjectSize(Object o) {
+    public static long sizeOf(Object o) {
         return instrumentation.getObjectSize(o);
     }
 }

@@ -8,6 +8,8 @@ public class Visualizer {
 	private static Hashtable<Long,Thread> threadTable = new Hashtable<Long, Thread>();
 	private  static Hashtable<Long,ArrayList<ActivitySlice>> activityTable = new Hashtable<Long, ArrayList<ActivitySlice>>();
 	
+	//accepting thread table
+	private static Hashtable<Long,Long> acceptingTable = new Hashtable<Long, Long>();
 	//threads currently active
 	private static long activeThreads = 0; 
 	//all threads created ever
@@ -22,6 +24,12 @@ public class Visualizer {
 	//kicks off our data collection at every tickRate interval
 	private static Timer collectionTimer = new Timer();
 	private static boolean timerStarted = false;
+	
+	private static enum AcceptState{
+		none, all, some
+	}
+	
+	private static AcceptState acceptState = AcceptState.none; 
 	
 	//Threads will call this method to add themselves to the ArrayList
 	public static void addThread(Thread th)
@@ -90,6 +98,32 @@ public class Visualizer {
 	{
 		collectionTimer.cancel();
 		collectionTimer.purge();
+	}
+	
+	public static void startActivityNotifications()
+	{
+		acceptState = AcceptState.all;
+	}
+	
+	public static void stopActivityNotifications()
+	{
+		acceptState = AcceptState.none;
+		acceptingTable.clear();
+	}
+	
+	public static void startActivityNotifications(long id){
+		acceptingTable.put(id, id);
+	}
+	
+	public static void stopActivityNotifications(long id){
+		acceptingTable.remove(id);
+	}
+	
+	public static boolean isAcceptingThread(long id)
+	{
+		if(acceptState.equals(AcceptState.none)) return false;
+		if(acceptingTable.get(id) != null) return true; 
+		return false; 
 	}
 
 }
