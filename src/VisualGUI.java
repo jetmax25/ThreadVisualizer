@@ -25,13 +25,13 @@ import org.jfree.data.xy.XYSeriesCollection;
 public class VisualGUI {
 	
 	XYSeriesCollection dataset;
-	JFreeChart chart;
-	JFreeChart chart2;
-	JFreeChart currChart;
+	JFreeChart chart; //CPU usage chart
+	JFreeChart chart2; //Memory usage chart
+	JFreeChart currChart; //currChart keeps track of the chart currently being displayed to the user
 	ChartPanel chartPanel;
 	ChartPanel chartPanel2;
 	XYSeries[] seriesArray;
-	JCheckBox[] checkboxes;
+	JCheckBox[] checkboxes; //array that hold all of the checkboxes
 	JFrame jframe;
 	GridBagConstraints gc;
 	JPanel jpanel1;
@@ -220,23 +220,24 @@ public class VisualGUI {
 						}
 					});
 					thread.run();
-					
-					
-					
-					
-					
+								
 	}
 	
+	//This method returns a random integer
 	public static int returnRandom(){
 		Random rn = new Random();
 		int answer = rn.nextInt(100) + 1;
 		return answer;
 	}
 	
+	
+	//This method gets the number of threads from the library and returns it
 	public static int getNumberOfThreads(){
-		return 6;
+		return 4;
 	}
 	
+	
+	//This method make a certain line on the line chart invisible 
 	public void removeSeries(String string){		
 		if(string == null)
 			return;
@@ -244,7 +245,6 @@ public class VisualGUI {
 		int i=1;
 		while(i<100){
 			if(string.endsWith(Integer.toString(i))){
-				//dataset.removeSeries(0);
 				XYPlot plot = (XYPlot) currChart.getPlot();
 				XYItemRenderer renderer = plot.getRenderer();
 				renderer.setSeriesVisible(i-1, false);
@@ -255,6 +255,8 @@ public class VisualGUI {
 		}
 	}
 	
+	
+	//This method makes a previously invisible line on the line chart visible again
 	public void addSeries(String string){		
 		if(string == null)
 			return;
@@ -262,7 +264,6 @@ public class VisualGUI {
 		int i=1;
 		while(i<100){
 			if(string.endsWith(Integer.toString(i))){
-				//dataset.removeSeries(0);
 				XYPlot plot = (XYPlot) currChart.getPlot();
 				XYItemRenderer renderer = plot.getRenderer();
 				renderer.setSeriesVisible(i-1, true);
