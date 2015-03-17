@@ -8,12 +8,14 @@ public class Visualizer {
 	private static Hashtable<Long,Thread> threadTable = new Hashtable<Long, Thread>();
 	private  static Hashtable<Long,ArrayList<ActivitySlice>> activityTable = new Hashtable<Long, ArrayList<ActivitySlice>>();
 	
+	//accepting thread table
+	private static Hashtable<Long,Long> acceptingTable = new Hashtable<Long, Long>();
 	//threads currently active
-	private static long activeThreads = 0; 
+	private static int activeThreads = 0; 
 	//all threads created ever
-	private static long totalThreads = 0; 
+	private static int totalThreads = 0; 
 	//most threads ever active
-	private static long maxThreads  = 0; 
+	private static int maxThreads  = 0; 
 	private static long start = System.currentTimeMillis(); 
 	
 	//rate at which the Visualizer logs CPU/Memory Usage, watched variables, etc.
@@ -23,7 +25,15 @@ public class Visualizer {
 	private static Timer collectionTimer = new Timer();
 	private static boolean timerStarted = false;
 	
+<<<<<<< HEAD
 	private static VisualGUI gui = new VisualGUI();	
+=======
+	private static enum AcceptState{
+		none, all, some
+	}
+	
+	private static AcceptState acceptState = AcceptState.none; 
+>>>>>>> 8a2856f66ec617d85bdc55d630cd5bdf0c6009d9
 	
 	//Threads will call this method to add themselves to the ArrayList
 	public static void addThread(Thread th)
@@ -93,5 +103,39 @@ public class Visualizer {
 		collectionTimer.cancel();
 		collectionTimer.purge();
 	}
+	
+	public static void startActivityNotifications()
+	{
+		acceptState = AcceptState.all;
+	}
+	
+	public static void stopActivityNotifications()
+	{
+		acceptState = AcceptState.none;
+		acceptingTable.clear();
+	}
+	
+	public static void startActivityNotifications(long id){
+		acceptingTable.put(id, id);
+	}
+	
+	public static void stopActivityNotifications(long id){
+		acceptingTable.remove(id);
+	}
+	
+	public static boolean isAcceptingThread(long id)
+	{
+		if(acceptState.equals(AcceptState.none)) return false;
+		if(acceptingTable.get(id) != null) return true; 
+		return false; 
+	}
+	
+	public static int getTotalThreads()
+	{
+		return totalThreads;
+	}
+
+
+	
 
 }

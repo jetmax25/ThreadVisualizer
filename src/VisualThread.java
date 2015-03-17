@@ -1,3 +1,4 @@
+import java.lang.instrument.Instrumentation;
 
 public class VisualThread extends Thread{
 	
@@ -127,6 +128,21 @@ public class VisualThread extends Thread{
 	
 	public void addSlice(String s )
 	{
-		Visualizer.addSlice(new ActivitySlice(s, this.id, System.currentTimeMillis()));
+		if(Visualizer.isAcceptingThread(this.id)) Visualizer.addSlice(new ActivitySlice(s, this.id, System.currentTimeMillis(), ObjectSizeFetcher.sizeOf(this) ));
 	}
+}
+
+
+
+
+ class ObjectSizeFetcher {
+    private static Instrumentation instrumentation;
+
+    public static void premain(String args, Instrumentation inst) {
+        instrumentation = inst;
+    }
+
+    public static long sizeOf(Object o) {
+        return instrumentation.getObjectSize(o);
+    }
 }
