@@ -4,6 +4,7 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.Date;
 import java.util.Random;
 
 import javax.swing.BoxLayout;
@@ -27,8 +28,6 @@ import org.jfree.data.gantt.Task;
 import org.jfree.data.gantt.TaskSeries;
 import org.jfree.data.gantt.TaskSeriesCollection;
 import org.jfree.data.gantt.XYTaskDataset;
-import org.jfree.data.time.Day;
-import org.jfree.data.time.Hour;
 import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
 
@@ -104,7 +103,11 @@ public class VisualGUI {
 					taskSeriesArray = new TaskSeries[getNumberOfThreads()];
 					for(int i=0; i<taskSeriesArray.length; i++){
 						taskSeriesArray[i] = new TaskSeries("Thread" + Integer.toString(i+1));
-						taskSeriesArray[i].add(new Task("herro", new Hour(i, new Day())));
+						
+						//The Task object has the parameters Task(String, Date start, Date end)
+						//The class Date represents a specific instant in time, with millisecond precision.
+						//Make sure to cast the Date parameter to a long 
+						taskSeriesArray[i].add(new Task("herro", new Date(2*i), new Date(3*i)));
 						data4.add(taskSeriesArray[i]);
 					}
 					
