@@ -14,11 +14,14 @@ import javax.swing.JPanel;
 
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
+import org.jfree.chart.ChartUtilities;
 import org.jfree.chart.JFreeChart;
+import org.jfree.chart.axis.DateAxis;
 import org.jfree.chart.axis.NumberAxis;
 import org.jfree.chart.axis.SymbolAxis;
 import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.chart.plot.XYPlot;
+import org.jfree.chart.renderer.xy.XYBarRenderer;
 import org.jfree.chart.renderer.xy.XYItemRenderer;
 import org.jfree.data.gantt.Task;
 import org.jfree.data.gantt.TaskSeries;
@@ -37,10 +40,12 @@ public class VisualGUI {
 	XYTaskDataset dataset4;
 	JFreeChart chart; //CPU usage chart
 	JFreeChart chart2; //Memory usage chart
+	JFreeChart chart3;
 	JFreeChart chart4; //Critical Section chart
 	JFreeChart currChart; //currChart keeps track of the chart currently being displayed to the user
 	ChartPanel chartPanel;
 	ChartPanel chartPanel2;
+	ChartPanel chartPanel3;
 	ChartPanel chartPanel4;
 	XYSeries[] seriesArray;
 	TaskSeries[] taskSeriesArray;
@@ -52,8 +57,15 @@ public class VisualGUI {
 	JPanel jpanel3;
 	
 	XYPlot plot1;
+	XYPlot plot2;
+	XYPlot plot3;
 	XYPlot plot4;
 	NumberAxis domain1;
+	NumberAxis domain2;
+	NumberAxis domain3;
+	NumberAxis domain4;
+	
+	XYBarRenderer renderer4;
 	
 	public VisualGUI(){
 		// create a dataset...
@@ -76,6 +88,7 @@ public class VisualGUI {
 					chart4 = ChartFactory.createXYBarChart("Critical Sections", "Thread", false, "Time", dataset4, PlotOrientation.HORIZONTAL, true, true, false);
 					
 					
+					
 					String[] labels = new String[getNumberOfThreads()];
 					for(int j=0; j<labels.length; j++){
 						labels[j] = "Thread " + (j+1);
@@ -83,12 +96,15 @@ public class VisualGUI {
 					SymbolAxis symbolaxis = new SymbolAxis("Series", labels);
 					plot4 = chart4.getXYPlot();
 					plot4.setDomainAxis(symbolaxis);
-					
+					plot4.setRangeAxis(new DateAxis("Time"));
+					renderer4 = (XYBarRenderer) plot4.getRenderer();
+					renderer4.setUseYInterval(true);
+					ChartUtilities.applyCurrentTheme(chart4);
 					
 					taskSeriesArray = new TaskSeries[getNumberOfThreads()];
 					for(int i=0; i<taskSeriesArray.length; i++){
 						taskSeriesArray[i] = new TaskSeries("Thread" + Integer.toString(i+1));
-						taskSeriesArray[i].add(new Task("herro", new Hour(i+5, new Day())));
+						taskSeriesArray[i].add(new Task("herro", new Hour(i, new Day())));
 						data4.add(taskSeriesArray[i]);
 					}
 					
