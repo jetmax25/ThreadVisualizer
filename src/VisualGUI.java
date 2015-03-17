@@ -78,7 +78,7 @@ public class VisualGUI {
 					
 					String[] labels = new String[getNumberOfThreads()];
 					for(int j=0; j<labels.length; j++){
-						labels[j] = "Threads" + (j+1);
+						labels[j] = "Thread " + (j+1);
 					}
 					SymbolAxis symbolaxis = new SymbolAxis("Series", labels);
 					plot4 = chart4.getXYPlot();
@@ -88,9 +88,7 @@ public class VisualGUI {
 					taskSeriesArray = new TaskSeries[getNumberOfThreads()];
 					for(int i=0; i<taskSeriesArray.length; i++){
 						taskSeriesArray[i] = new TaskSeries("Thread" + Integer.toString(i+1));
-						taskSeriesArray[i].add(new Task("T" +i+ "a", new Hour(11, new Day())));
-						taskSeriesArray[i].add(new Task("T" +i+ "b", new Hour(15, new Day())));
-						taskSeriesArray[i].add(new Task("T" +i+ "c", new Hour(19, new Day())));
+						taskSeriesArray[i].add(new Task("herro", new Hour(i+5, new Day())));
 						data4.add(taskSeriesArray[i]);
 					}
 					
