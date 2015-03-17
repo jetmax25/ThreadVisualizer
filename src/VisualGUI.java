@@ -46,7 +46,7 @@ public class VisualGUI {
 					chart = ChartFactory.createXYLineChart("CPU Usage", "Time", "Percentage", dataset, PlotOrientation.VERTICAL, true, true, false);
 					currChart = chart;
 					
-					chart2 = ChartFactory.createXYLineChart("Memory Usage", "Time", "Percentage", dataset, PlotOrientation.VERTICAL, true, true, false);
+					chart2 = ChartFactory.createXYLineChart("Memory Usage", "Time", "Percentage", null, PlotOrientation.VERTICAL, true, true, false);
 					
 					// create a panel to put the chart in
 					chartPanel = new ChartPanel(chart);
@@ -272,6 +272,11 @@ public class VisualGUI {
 			}
 			i++;
 		}
+	}
+	
+	//This method will be called by the library when the number of threads changes
+	public void numThreadsChanged(int newNumThreads){
+		//code goes here
 	}
 	
 }
