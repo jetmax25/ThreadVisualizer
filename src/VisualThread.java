@@ -8,7 +8,8 @@ public class VisualThread extends Thread{
 		super();
 		this.id = super.getId();
 		Visualizer.addThread(this);
-		this.addSlice("Initialized");		
+		this.addSlice("Initialized");	
+	
 	}
 
 	@Override
@@ -130,6 +131,17 @@ public class VisualThread extends Thread{
 	{
 		if(Visualizer.isAcceptingThread(this.id)) Visualizer.addSlice(new ActivitySlice(s, this.id, System.currentTimeMillis(), ObjectSizeFetcher.sizeOf(this) ));
 	}
+	
+	public void enterCriticalSection(String section)
+	{
+		Visualizer.enteringCriticalSection(this.id, section, System.currentTimeMillis());
+	}
+	
+	public void leaveCriticalSection(String section)
+	{
+		Visualizer.leavingCriticalSection(this.id, section, System.currentTimeMillis());
+	}
+	
 }
 
 

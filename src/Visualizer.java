@@ -7,7 +7,9 @@ public class Visualizer {
 
 	private static Hashtable<Long,Thread> threadTable = new Hashtable<Long, Thread>();
 	private  static Hashtable<Long,ArrayList<ActivitySlice>> activityTable = new Hashtable<Long, ArrayList<ActivitySlice>>();
-	
+	private static Hashtable<String, Hashtable<Long, long[]>> criticalSection = new Hashtable<String, Hashtable<Long, long[]>>(); 
+
+	private static ActivitySlice lastSlice = null; 
 	//accepting thread table
 	private static Hashtable<Long,Long> acceptingTable = new Hashtable<Long, Long>();
 	//threads currently active
@@ -65,6 +67,8 @@ public class Visualizer {
 		temp.add(as);
 		//save it
 		activityTable.put(num, temp);
+		
+		lastSlice = as;
 	}
 	
 	public synchronized static void printAll()
@@ -133,7 +137,32 @@ public class Visualizer {
 		return totalThreads;
 	}
 
-
+	public static ActivitySlice getActivity()
+	{
+		return lastSlice; 
+	}
 	
-
+	public static ActivitySlice getActivity(long id)
+	{
+		if(!activityTable.containsKey(id)) return null; 
+		
+		ArrayList<ActivitySlice> temp = activityTable.get(id);
+		return temp.get(temp.size() - 1);
+		
+	}
+	
+	public static void enteringCriticalSection(long id, String section, long time)
+	{
+		if(!criticalSection.containsKey(section)) criticalSection.put(section, new Hashtable<Long, long[]>());
+		long[] temp = {time, -1};
+		criticalSection.get(section).put(id, temp );
+	}
+	
+	public static void leavingCriticalSection(long id, String section, long time)
+	{
+		long[] temp = {criticalSection.get(section).get(id)[0], time}; 
+		criticalSection.get(section).put(id, temp );
+	}
+	
+	
 }
