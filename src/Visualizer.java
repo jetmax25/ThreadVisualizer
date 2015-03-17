@@ -24,16 +24,14 @@ public class Visualizer {
 	//kicks off our data collection at every tickRate interval
 	private static Timer collectionTimer = new Timer();
 	private static boolean timerStarted = false;
-	
-<<<<<<< HEAD
+
 	private static VisualGUI gui = new VisualGUI();	
-=======
 	private static enum AcceptState{
 		none, all, some
 	}
 	
 	private static AcceptState acceptState = AcceptState.none; 
->>>>>>> 8a2856f66ec617d85bdc55d630cd5bdf0c6009d9
+
 	
 	//Threads will call this method to add themselves to the ArrayList
 	public static void addThread(Thread th)
