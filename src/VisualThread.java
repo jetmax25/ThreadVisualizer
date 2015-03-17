@@ -8,8 +8,7 @@ public class VisualThread extends Thread{
 		super();
 		this.id = super.getId();
 		Visualizer.addThread(this);
-		this.addSlice("Initialized");
-		
+		this.addSlice("Initialized");		
 	}
 
 	@Override
