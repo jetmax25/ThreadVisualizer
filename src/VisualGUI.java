@@ -15,9 +15,17 @@ import javax.swing.JPanel;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
+import org.jfree.chart.axis.NumberAxis;
+import org.jfree.chart.axis.SymbolAxis;
 import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.chart.plot.XYPlot;
 import org.jfree.chart.renderer.xy.XYItemRenderer;
+import org.jfree.data.gantt.Task;
+import org.jfree.data.gantt.TaskSeries;
+import org.jfree.data.gantt.TaskSeriesCollection;
+import org.jfree.data.gantt.XYTaskDataset;
+import org.jfree.data.time.Day;
+import org.jfree.data.time.Hour;
 import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
 
@@ -25,12 +33,17 @@ import org.jfree.data.xy.XYSeriesCollection;
 public class VisualGUI {
 	
 	XYSeriesCollection dataset;
+	TaskSeriesCollection data4;
+	XYTaskDataset dataset4;
 	JFreeChart chart; //CPU usage chart
 	JFreeChart chart2; //Memory usage chart
+	JFreeChart chart4; //Critical Section chart
 	JFreeChart currChart; //currChart keeps track of the chart currently being displayed to the user
 	ChartPanel chartPanel;
 	ChartPanel chartPanel2;
+	ChartPanel chartPanel4;
 	XYSeries[] seriesArray;
+	TaskSeries[] taskSeriesArray;
 	JCheckBox[] checkboxes; //array that hold all of the checkboxes
 	JFrame jframe;
 	GridBagConstraints gc;
@@ -38,15 +51,49 @@ public class VisualGUI {
 	JPanel jpanel2;
 	JPanel jpanel3;
 	
+	XYPlot plot1;
+	XYPlot plot4;
+	NumberAxis domain1;
+	
 	public VisualGUI(){
 		// create a dataset...
 					dataset = new XYSeriesCollection();			
-
+					
+					data4 = new TaskSeriesCollection();
+					dataset4 = new XYTaskDataset(data4);
+					
+					
 					// create a chart...
 					chart = ChartFactory.createXYLineChart("CPU Usage", "Time", "Percentage", dataset, PlotOrientation.VERTICAL, true, true, false);
 					currChart = chart;
 					
-					chart2 = ChartFactory.createXYLineChart("Memory Usage", "Time", "Percentage", null, PlotOrientation.VERTICAL, true, true, false);
+					plot1 = (XYPlot) chart.getPlot();
+					domain1 = (NumberAxis) plot1.getDomainAxis();
+					domain1.setRange(0, 10);
+					
+					chart2 = ChartFactory.createXYLineChart("Memory Usage", "Time", "Percentage", dataset, PlotOrientation.VERTICAL, true, true, false);
+					
+					chart4 = ChartFactory.createXYBarChart("Critical Sections", "Thread", false, "Time", dataset4, PlotOrientation.HORIZONTAL, true, true, false);
+					
+					
+					String[] labels = new String[getNumberOfThreads()];
+					for(int j=0; j<labels.length; j++){
+						labels[j] = "Threads" + (j+1);
+					}
+					SymbolAxis symbolaxis = new SymbolAxis("Series", labels);
+					plot4 = chart4.getXYPlot();
+					plot4.setDomainAxis(symbolaxis);
+					
+					
+					taskSeriesArray = new TaskSeries[getNumberOfThreads()];
+					for(int i=0; i<taskSeriesArray.length; i++){
+						taskSeriesArray[i] = new TaskSeries("Thread" + Integer.toString(i+1));
+						taskSeriesArray[i].add(new Task("T" +i+ "a", new Hour(11, new Day())));
+						taskSeriesArray[i].add(new Task("T" +i+ "b", new Hour(15, new Day())));
+						taskSeriesArray[i].add(new Task("T" +i+ "c", new Hour(19, new Day())));
+						data4.add(taskSeriesArray[i]);
+					}
+					
 					
 					// create a panel to put the chart in
 					chartPanel = new ChartPanel(chart);
@@ -110,7 +157,12 @@ public class VisualGUI {
 					
 					button4.addActionListener(new ActionListener(){
 						public void actionPerformed(ActionEvent e){
-							//add code here
+							chartPanel4 = new ChartPanel(chart4);
+							jpanel2.removeAll();
+							jpanel2.add(chartPanel4);
+							jpanel2.revalidate();
+							jpanel2.repaint();
+							currChart = chart4;
 						}
 					});
 					
@@ -210,6 +262,8 @@ public class VisualGUI {
 							while(counter < 100){
 								for(i=0; i<seriesArray.length; i++){
 									seriesArray[i].add(counter, returnRandom());
+									if(counter > 10)
+										domain1.setRange(counter-10, counter);
 								}
 								counter++;
 								try{Thread.sleep(1000);}
@@ -220,8 +274,20 @@ public class VisualGUI {
 						}
 					});
 					thread.run();
+					
+					
+//					for(i=0; i<taskSeriesArray.length; i++){
+//						taskSeriesArray[i].add(new Task("T" +i+ "a", new Hour(11, new Day())));
+//						taskSeriesArray[i].add(new Task("T" +i+ "b", new Hour(15, new Day())));
+//						taskSeriesArray[i].add(new Task("T" +i+ "c", new Hour(19, new Day())));
+//					}
 								
 	}
+	
+//	
+//	public static void createChart(IntervalXYDataset set){
+//		
+//	}
 	
 	//This method returns a random integer
 	public static int returnRandom(){
@@ -233,7 +299,8 @@ public class VisualGUI {
 	
 	//This method gets the number of threads from the library and returns it
 	public static int getNumberOfThreads(){
-		return 4;
+		//return Visualizer.getTotalThreads();
+		return 7;
 	}
 	
 	
