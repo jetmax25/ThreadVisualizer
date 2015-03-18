@@ -112,14 +112,12 @@ public class VisualGUI {
 
 
 				//this is for chart4 *****************************************************************************
-				taskSeriesArray = new TaskSeries[(int)getNumberOfThreads()];										//****
+				taskSeriesArray = new TaskSeries[(int)getNumberOfThreads()];								//****
 				for(int i=0; i<taskSeriesArray.length; i++){												//****
 					taskSeriesArray[i] = new TaskSeries("Thread" + Integer.toString(i+1));					//****
-					//****
 					//The Task object has the parameters Task(String, Date start, Date end)					//****
 					//The class Date represents a specific instant in time, with millisecond precision.		//****
-					//Make sure to cast the Date parameter to a long 										//****
-					taskSeriesArray[i].add(new Task("herro", new Date(2*(i+1)), new Date(3*(i+1))));				//****
+					taskSeriesArray[i].add(new Task("herro", new Date(2*(i+1)), new Date(3*(i+1))));		//****
 					data4.add(taskSeriesArray[i]);															//****
 				}																							//****
 				//************************************************************************************************
@@ -128,7 +126,7 @@ public class VisualGUI {
 				chartPanel = new ChartPanel(chart);
 
 				//This is for chart1 *****************************************************
-				seriesArray = new XYSeries[(int)getNumberOfThreads()];                     //**
+				seriesArray = new XYSeries[(int)getNumberOfThreads()];                //**
 				for(int i = 0; i<seriesArray.length; i++){                            //**
 					seriesArray[i] = new XYSeries("Thread" + Integer.toString(i+1));  //**
 					dataset.addSeries(seriesArray[i]);								  //**
@@ -362,6 +360,15 @@ public class VisualGUI {
 			}
 			i++;
 		}
+	}
+	
+	
+	//This method adds a critical section to the critical section bar chart and should be called by
+	//the Visualizer class when the Visualizer.leaveCriticalSection() method is used
+	public void addCriticalSection(int id, long enterTime, long exitTime){
+		Date enter = new Date(enterTime);
+		Date exit = new Date(exitTime);
+		taskSeriesArray[id].add(new Task("ldkj", enter, exit));
 	}
 
 	//This method will be called by the library when the number of threads changes
