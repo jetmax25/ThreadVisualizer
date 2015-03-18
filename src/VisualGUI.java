@@ -12,6 +12,7 @@ import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
@@ -241,7 +242,6 @@ public class VisualGUI {
 				jpanel3.setVisible(true);
 
 
-
 				//Adding components to JFrame using GridBagLayout manager
 				jframe = new JFrame("Concurrent Visualizer");
 				jframe.setLayout(new GridBagLayout());
@@ -321,7 +321,7 @@ public class VisualGUI {
 	//This method gets the number of threads from the library and returns it
 	public static long getNumberOfThreads(){
 		return Visualizer.threadCount();
-		//return 7;
+		//return 25;
 	}
 
 
