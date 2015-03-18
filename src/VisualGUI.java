@@ -68,6 +68,7 @@ public class VisualGUI {
 
 	public VisualGUI(){
 
+		
 		Thread guiThread = new Thread(new Runnable(){
 			public void run(){
 				// create datasets

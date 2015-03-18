@@ -1,12 +1,33 @@
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
+
+import com.sun.tools.javac.comp.Enter;
+
 
 public class testDriver {
 
+	static Lock lock = new ReentrantLock(true);
+	static VisualThread x;
+	static VisualThread y;
+	
 	public static void main(String[] args) throws InterruptedException {
 		// TODO Auto-generated method stub
-		VisualThread x = new VisualThread();
+		x = new VisualThread(new Runnable(){
+			public void run(){
+				x.enterCriticalSection("hello");
+				criticalMethod();
+				x.leaveCriticalSection("goodbye");
+			}
+		});
 		x.start();
 		
-		VisualThread y = new VisualThread();
+		y = new VisualThread(new Runnable(){
+			public void run(){
+				y.enterCriticalSection("whats up");
+				criticalMethod();
+				y.leaveCriticalSection("see ya later");
+			}
+		});
 		y.start();
 		
 		for(int i = 0; i < 5; i++)
@@ -16,11 +37,27 @@ public class testDriver {
 			System.out.println("*******************************");
 		}
 		
+		
+		
 		x.interrupt();
 		y.interrupt();
 		x.join();
 		y.join();
 		Visualizer.printAll();
+		
+//		Thread.sleep(5000);
+//		VisualThread z = new VisualThread();
+//		z.start();
 	}
+	
+	
+	public static void criticalMethod(){
+		lock.lock();
+		try{Thread.sleep(3000);}
+		catch(InterruptedException e){}
+		lock.unlock();
+		
+	}
+	
 
 }

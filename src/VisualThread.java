@@ -11,6 +11,13 @@ public class VisualThread extends Thread{
 		this.addSlice("Initialized");	
 	
 	}
+	
+	public VisualThread(Runnable target){
+		super(target);
+		this.id = super.getId();
+		Visualizer.addThread(this);
+		this.addSlice("Initialized");
+	}
 
 	@Override
 	protected Object clone() throws CloneNotSupportedException {
