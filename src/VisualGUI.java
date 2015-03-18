@@ -35,6 +35,7 @@ import org.jfree.data.xy.XYSeriesCollection;
 public class VisualGUI {
 	
 	XYSeriesCollection dataset;
+	XYSeriesCollection dataset2;
 	TaskSeriesCollection data4;
 	XYTaskDataset dataset4;
 	JFreeChart chart; //CPU usage chart
@@ -67,14 +68,16 @@ public class VisualGUI {
 	XYBarRenderer renderer4;
 	
 	public VisualGUI(){
-		// create a dataset...
-					dataset = new XYSeriesCollection();			
+					// create datasets
+					dataset = new XYSeriesCollection();	
+					
+					dataset2 = new XYSeriesCollection();
 					
 					data4 = new TaskSeriesCollection();
 					dataset4 = new XYTaskDataset(data4);
 					
 					
-					// create a chart...
+					// create charts
 					chart = ChartFactory.createXYLineChart("CPU Usage", "Time", "Percentage", dataset, PlotOrientation.VERTICAL, true, true, false);
 					currChart = chart;
 					
@@ -87,41 +90,47 @@ public class VisualGUI {
 					chart4 = ChartFactory.createXYBarChart("Critical Sections", "Thread", false, "Time", dataset4, PlotOrientation.HORIZONTAL, true, true, false);
 					
 					
-					
-					String[] labels = new String[getNumberOfThreads()];
-					for(int j=0; j<labels.length; j++){
-						labels[j] = "Thread " + (j+1);
+					//create labels for the critical sections chart y-axis
+					String[] chart4AxisLabels = new String[getNumberOfThreads()];
+					for(int j=0; j<chart4AxisLabels.length; j++){
+						chart4AxisLabels[j] = "Thread " + (j+1);
 					}
-					SymbolAxis symbolaxis = new SymbolAxis("Series", labels);
+					SymbolAxis symbolaxis = new SymbolAxis("Series", chart4AxisLabels);
+					
+					//set the domain and range of the critical sections axes
 					plot4 = chart4.getXYPlot();
 					plot4.setDomainAxis(symbolaxis);
 					plot4.setRangeAxis(new DateAxis("Time"));
+					
+					//not entirely sure why we need these three lines but its started working when I put them in
 					renderer4 = (XYBarRenderer) plot4.getRenderer();
 					renderer4.setUseYInterval(true);
 					ChartUtilities.applyCurrentTheme(chart4);
 					
-					taskSeriesArray = new TaskSeries[getNumberOfThreads()];
-					for(int i=0; i<taskSeriesArray.length; i++){
-						taskSeriesArray[i] = new TaskSeries("Thread" + Integer.toString(i+1));
-						
-						//The Task object has the parameters Task(String, Date start, Date end)
-						//The class Date represents a specific instant in time, with millisecond precision.
-						//Make sure to cast the Date parameter to a long 
-						taskSeriesArray[i].add(new Task("herro", new Date(2*i), new Date(3*i)));
-						data4.add(taskSeriesArray[i]);
-					}
 					
+					//this is for chart4 *****************************************************************************
+					taskSeriesArray = new TaskSeries[getNumberOfThreads()];										//****
+					for(int i=0; i<taskSeriesArray.length; i++){												//****
+						taskSeriesArray[i] = new TaskSeries("Thread" + Integer.toString(i+1));					//****
+																												//****
+						//The Task object has the parameters Task(String, Date start, Date end)					//****
+						//The class Date represents a specific instant in time, with millisecond precision.		//****
+						//Make sure to cast the Date parameter to a long 										//****
+						taskSeriesArray[i].add(new Task("herro", new Date(2*i), new Date(3*i)));				//****
+						data4.add(taskSeriesArray[i]);															//****
+					}																							//****
+					//************************************************************************************************
 					
 					// create a panel to put the chart in
 					chartPanel = new ChartPanel(chart);
 					
-					
-					seriesArray = new XYSeries[getNumberOfThreads()];
-					for(int i = 0; i<seriesArray.length; i++){
-						seriesArray[i] = new XYSeries("Thread" + Integer.toString(i+1));
-						dataset.addSeries(seriesArray[i]);
-					}
-					
+					//This is for chart1 *****************************************************
+					seriesArray = new XYSeries[getNumberOfThreads()];                     //**
+					for(int i = 0; i<seriesArray.length; i++){                            //**
+						seriesArray[i] = new XYSeries("Thread" + Integer.toString(i+1));  //**
+						dataset.addSeries(seriesArray[i]);								  //**
+					}																	  //**
+					//************************************************************************
 					
 					chartPanel.setVisible(true);
 						
@@ -292,19 +301,9 @@ public class VisualGUI {
 					});
 					thread.run();
 					
-					
-//					for(i=0; i<taskSeriesArray.length; i++){
-//						taskSeriesArray[i].add(new Task("T" +i+ "a", new Hour(11, new Day())));
-//						taskSeriesArray[i].add(new Task("T" +i+ "b", new Hour(15, new Day())));
-//						taskSeriesArray[i].add(new Task("T" +i+ "c", new Hour(19, new Day())));
-//					}
 								
 	}
 	
-//	
-//	public static void createChart(IntervalXYDataset set){
-//		
-//	}
 	
 	//This method returns a random integer
 	public static int returnRandom(){
