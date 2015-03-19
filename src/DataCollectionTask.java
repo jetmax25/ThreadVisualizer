@@ -4,6 +4,8 @@
 *	Collects system information and reports it back to the visualizer
 */
 
+import org.hyperic.sigar.*;
+
 public class DataCollectionTask implements Runnable {
 
 	@Override
@@ -11,15 +13,25 @@ public class DataCollectionTask implements Runnable {
 
 		System.out.println("Create Slice");
 
-		SystemInfo si = new SystemInfo();
-			
-		//create dummy data
+		Sigar sigar = new Sigar();
 
-		SystemSlice slice = si.getSlice();
+		Cpu c;
 
-		Visualizer.addSystemSlice(slice);
+		try{
+			c = sigar.getCpu();
+		} catch(SigarException se) {
+			System.out.println("Unable to gather CPU info");
+			return;
+		}
 
-		System.out.println(slice.toString());
+		System.out.println(c.getIdle() + " : " + c.getTotal());
+
+
+
+
+		//Visualizer.addSystemSlice(slice);
+
+		//System.out.println(slice.toString());
 
 	}
 

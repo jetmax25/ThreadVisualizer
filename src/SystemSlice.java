@@ -15,6 +15,11 @@ public class SystemSlice {
 	{
 		return "CPU: " + cpuPercent + " Mem: " + memUse + " " + (time - start);
 	}
+
+	public String toString()
+	{
+		return "CPU: " + cpuPercent + " Mem: " + memUse + " " + time;	
+	}
 	
 	public int getCpu()
 	{
