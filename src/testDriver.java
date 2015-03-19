@@ -14,18 +14,26 @@ public class testDriver {
 		// TODO Auto-generated method stub
 		x = new VisualThread(new Runnable(){
 			public void run(){
-				x.enterCriticalSection("hello");
-				criticalMethod();
-				x.leaveCriticalSection("goodbye");
+				int i=0;
+				while(i<5){
+					x.enterCriticalSection("hello");
+					criticalMethod();
+					x.leaveCriticalSection("goodbye");
+					i++;
+				}
 			}
 		});
 		x.start();
 		
 		y = new VisualThread(new Runnable(){
 			public void run(){
-				y.enterCriticalSection("whats up");
-				criticalMethod();
-				y.leaveCriticalSection("see ya later");
+				int i=0;
+				while(i<5){
+					y.enterCriticalSection("whats up");
+					criticalMethod();
+					y.leaveCriticalSection("see ya later");
+					i++;
+				}
 			}
 		});
 		y.start();

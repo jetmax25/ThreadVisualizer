@@ -12,8 +12,8 @@ public class VisualThread extends Thread{
 	
 	}
 	
-	public VisualThread(Runnable target){
-		super(target);
+	public VisualThread(Runnable runnable){
+		super(runnable);
 		this.id = super.getId();
 		Visualizer.addThread(this);
 		this.addSlice("Initialized");

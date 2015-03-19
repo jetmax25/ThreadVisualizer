@@ -12,7 +12,6 @@ import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
-import javax.swing.JScrollPane;
 
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
@@ -48,6 +47,7 @@ public class VisualGUI {
 	ChartPanel chartPanel3;
 	ChartPanel chartPanel4;
 	XYSeries[] seriesArray;
+	XYSeries[] seriesArray2;
 	TaskSeries[] taskSeriesArray;
 	JCheckBox[] checkboxes; //array that hold all of the checkboxes
 	JFrame jframe;
@@ -67,7 +67,7 @@ public class VisualGUI {
 
 	XYBarRenderer renderer4;
 
-	public VisualGUI(){
+	protected VisualGUI(){
 
 		
 		Thread guiThread = new Thread(new Runnable(){
@@ -85,12 +85,15 @@ public class VisualGUI {
 				chart = ChartFactory.createXYLineChart("CPU Usage", "Time", "Percentage", dataset, PlotOrientation.VERTICAL, true, true, false);
 				currChart = chart;
 
-				plot1 = (XYPlot) chart.getPlot();
+				plot1 = (XYPlot) chart.getXYPlot();
 				domain1 = (NumberAxis) plot1.getDomainAxis();
-				domain1.setRange(0, 10);
+				domain1.setRange(0,10);
 
-				chart2 = ChartFactory.createXYLineChart("Memory Usage", "Time", "Percentage", dataset, PlotOrientation.VERTICAL, true, true, false);
-
+				chart2 = ChartFactory.createXYLineChart("Memory Usage", "Time", "Percentage", dataset2, PlotOrientation.VERTICAL, true, true, false);
+				plot2 = (XYPlot) chart2.getXYPlot();
+				domain2 = (NumberAxis) plot2.getDomainAxis();
+				domain2.setRange(0,10);
+				
 				chart4 = ChartFactory.createXYBarChart("Critical Sections", "Thread", false, "Time", dataset4, PlotOrientation.HORIZONTAL, true, true, false);
 
 
@@ -126,16 +129,20 @@ public class VisualGUI {
 				// create a panel to put the chart in
 				chartPanel = new ChartPanel(chart);
 
-				//This is for chart1 *****************************************************
-				seriesArray = new XYSeries[(int)getNumberOfThreads()];                //**
+				//This is for chart1 and chart2 ******************************************
+				seriesArray = new XYSeries[(int)getNumberOfThreads()];				  //**
+				seriesArray2 = new XYSeries[(int) getNumberOfThreads()];			  //**
 				for(int i = 0; i<seriesArray.length; i++){                            //**
 					seriesArray[i] = new XYSeries("Thread" + Integer.toString(i+1));  //**
+					seriesArray2[i] = new XYSeries("Thread" + Integer.toString(2*i)); //**
 					dataset.addSeries(seriesArray[i]);								  //**
+					dataset2.addSeries(seriesArray2[i]);    						  //**
 				}																	  //**
 				//************************************************************************
 
 				chartPanel.setVisible(true);
-
+				
+				
 
 				//creating JButtons for JPanel 1
 				JButton button1 = new JButton("CPU Visualizer");
@@ -289,8 +296,11 @@ public class VisualGUI {
 						while(counter < 100){
 							for(i=0; i<seriesArray.length; i++){
 								seriesArray[i].add(counter, returnRandom());
-								if(counter > 10)
+								seriesArray2[i].add(counter, (returnRandom()*2)%100);
+								if(counter > 10){
 									domain1.setRange(counter-10, counter);
+									domain2.setRange(counter-10, counter);
+								}
 							}
 							counter++;
 							try{Thread.sleep(1000);}
@@ -311,7 +321,7 @@ public class VisualGUI {
 
 
 	//This method returns a random integer
-	public static int returnRandom(){
+	private static int returnRandom(){
 		Random rn = new Random();
 		int answer = rn.nextInt(100) + 1;
 		return answer;
@@ -319,14 +329,14 @@ public class VisualGUI {
 
 
 	//This method gets the number of threads from the library and returns it
-	public static long getNumberOfThreads(){
+	private static long getNumberOfThreads(){
 		return Visualizer.threadCount();
 		//return 25;
 	}
 
 
 	//This method make a certain line on the line chart invisible 
-	public void removeSeries(String string){		
+	private void removeSeries(String string){		
 		if(string == null)
 			return;
 
@@ -345,7 +355,7 @@ public class VisualGUI {
 
 
 	//This method makes a previously invisible line on the line chart visible again
-	public void addSeries(String string){		
+	private void addSeries(String string){		
 		if(string == null)
 			return;
 
@@ -362,13 +372,18 @@ public class VisualGUI {
 		}
 	}
 	
+	//This method takes in an ActivitySlice as a parameter and sends the data
+	//to the charts
+	public void addActivitySlice(ActivitySlice slice){
+		
+		
+	}
+	
 	
 	//This method adds a critical section to the critical section bar chart and should be called by
 	//the Visualizer class when the Visualizer.leaveCriticalSection() method is used
-	public void addCriticalSection(int id, long enterTime, long exitTime){
-		Date enter = new Date(enterTime);
-		Date exit = new Date(exitTime);
-		taskSeriesArray[id].add(new Task("ldkj", enter, exit));
+	public void addCriticalSection(int threadNum, Date enterTime, Date exitTime){
+		taskSeriesArray[threadNum].add(new Task("ldkj", enterTime, exitTime));
 	}
 
 	//This method will be called by the library when the number of threads changes
