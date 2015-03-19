@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
-package org.hyperic.sigar.cmd;
-
 import org.hyperic.sigar.SigarException;
 import org.hyperic.sigar.SigarPermissionDeniedException;
+
+import org.hyperic.sigar.cmd.SigarCommandBase;
 
 /**
  * Display all process information.
@@ -64,7 +64,6 @@ public class SystemInfo extends SigarCommandBase {
         return new SystemSlice(1, 2, (long)3);
     }
 
-    @Override
     public void output(String[] args) throws SigarException {
     }
 
