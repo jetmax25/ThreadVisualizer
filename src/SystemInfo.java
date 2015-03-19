@@ -26,7 +26,7 @@ public class SystemInfo extends SigarCommandBase {
 
     private boolean isSingleProcess;
 
-    public ProcInfo() {
+    public SystemInfo() {
         super();
     }
 
@@ -42,6 +42,34 @@ public class SystemInfo extends SigarCommandBase {
         return true;
     }
 
+    public SystemSlice getSlice() {
+
+        /*
+
+        long[] pids = this.shell.findPids(args);
+
+        for (int i=0; i<pids.length; i++) {
+           try {
+                output(String.valueOf(pids[i]));
+            } catch (SigarPermissionDeniedException e) {
+                 println(this.shell.getUserDeniedMessage(pids[i]));
+            } catch (SigarException e) {
+                println("(" + e.getMessage() + ")");
+            }
+             println("\n------------------------\n");
+         }
+
+        */
+
+        return new SystemSlice(1, 2, (long)3);
+    }
+
+    @Override
+    public void output(String[] args) throws SigarException {
+    }
+
+    //this is an example method that I am working off of
+    /*
     public void output(String[] args) throws SigarException {
         this.isSingleProcess = false;
 
@@ -74,5 +102,6 @@ public class SystemInfo extends SigarCommandBase {
             }
         }
     }
+    */
 
 }

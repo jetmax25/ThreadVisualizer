@@ -4,19 +4,22 @@
 *	Collects system information and reports it back to the visualizer
 */
 
-
-import java.util.TimerTask;
-import java.util.Random;
-
-public class DataCollectionTask extends TimerTask {
+public class DataCollectionTask implements Runnable {
 
 	@Override
 	public void run() {
 
-		Random rng = new Random();
+		System.out.println("Create Slice");
+
+		SystemInfo si = new SystemInfo();
 			
 		//create dummy data
-		Visualizer.addSystemSlice(new SystemSlice(rng.nextInt(100), rng.nextInt(1024), System.currentTimeMillis()));
+
+		SystemSlice slice = si.getSlice();
+
+		Visualizer.addSystemSlice(slice);
+
+		System.out.println(slice.toString());
 
 	}
 

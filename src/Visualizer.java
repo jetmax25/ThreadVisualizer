@@ -1,6 +1,9 @@
 import java.util.ArrayList;
 import java.util.Hashtable;
-import java.util.Timer;
+
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 
 public class Visualizer {
@@ -22,8 +25,8 @@ public class Visualizer {
 	private static int tickRate = 500;
 
 	//kicks off our data collection at every tickRate interval
-	private static Timer collectionTimer = new Timer();
-	private static boolean timerStarted = false;
+	private static ScheduledExecutorService dataService = Executors.newSingleThreadScheduledExecutor();
+	private static boolean serviceStarted = false;
 	
 	//Threads will call this method to add themselves to the ArrayList
 	public static void addThread(Thread th)
@@ -84,19 +87,30 @@ public class Visualizer {
 	
 	public static void startDataCollection()
 	{
-		//if already started, cancel the tasks and restart (possibly at new rate)
-		if(timerStarted)
+		//if already started, shutdown the service and restart (possibly at new rate)
+		if(serviceStarted)
 		{
 			stopDataCollection();
 		}
 
-		collectionTimer.scheduleAtFixedRate(new DataCollectionTask(), 0, tickRate);
+		//dataService.scheduleAtFixedRate(new DataCollectionTask(), 0, tickRate, TimeUnit.MILLISECONDS);
+
+		//final ScheduledExecutorService service = Executors.newSingleThreadScheduledExecutor();
+    	dataService.scheduleAtFixedRate(new DataCollectionTask()
+		      /*{
+		        @Override
+		        public void run()
+		        {
+		          System.out.println("sdfglksjdfkljsdfkj");
+		        }
+		      }*/, 0, tickRate, TimeUnit.MILLISECONDS);
+
+		System.out.println("collection started");
 	}
 
 	public static void stopDataCollection()
 	{
-		collectionTimer.cancel();
-		collectionTimer.purge();
+		dataService.shutdown();
 	}
 
 }
