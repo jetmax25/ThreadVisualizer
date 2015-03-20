@@ -14,4 +14,11 @@
 	<natures>
 		<nature>org.eclipse.jdt.core.javanature</nature>
 	</natures>
+	<linkedResources>
+		<link>
+			<name>jfreechart-1.0.19</name>
+			<type>2</type>
+			<location>/Users/annastavropoulos/Downloads/jfreechart-1.0.19</location>
+		</link>
+	</linkedResources>
 </projectDescription>
