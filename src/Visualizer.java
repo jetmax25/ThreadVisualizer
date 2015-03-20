@@ -93,17 +93,7 @@ public class Visualizer {
 			stopDataCollection();
 		}
 
-		//dataService.scheduleAtFixedRate(new DataCollectionTask(), 0, tickRate, TimeUnit.MILLISECONDS);
-
-		//final ScheduledExecutorService service = Executors.newSingleThreadScheduledExecutor();
-    	dataService.scheduleAtFixedRate(new DataCollectionTask()
-		      /*{
-		        @Override
-		        public void run()
-		        {
-		          System.out.println("sdfglksjdfkljsdfkj");
-		        }
-		      }*/, 0, tickRate, TimeUnit.MILLISECONDS);
+    	dataService.scheduleAtFixedRate(new DataCollectionTask(), 0, tickRate, TimeUnit.MILLISECONDS);
 
 		System.out.println("collection started");
 	}
@@ -111,6 +101,21 @@ public class Visualizer {
 	public static void stopDataCollection()
 	{
 		dataService.shutdown();
+	}
+
+
+	//used by DataCollectionTask to calculate the current load
+	public static SystemSlice getLastSystemSlice()
+	{
+		if(systemList.isEmpty())
+			return null;
+		else
+			return systemList.get( systemList.size()-1 );
+	}
+
+	public static ArrayList<SystemSlice> getAllSystemSlices()
+	{
+		return systemList;
 	}
 
 }

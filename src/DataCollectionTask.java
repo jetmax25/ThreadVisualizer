@@ -11,27 +11,57 @@ public class DataCollectionTask implements Runnable {
 	@Override
 	public void run() {
 
-		System.out.println("Create Slice");
-
 		Sigar sigar = new Sigar();
 
-		Cpu c;
+		long pid = sigar.getPid();
+
+		ProcCpu ourProcCpu;
+		ProcMem ourProcMem;
+
+		ProcCpu prev;
+
+		Mem mem;
+		CpuPerc cpu;
+
+		double load;
+
+
 
 		try{
-			c = sigar.getCpu();
+			ourProcMem = sigar.getProcMem(pid);
+			ourProcCpu = sigar.getProcCpu(pid);
+
+			int cpuCount = sigar.getCpuList().length;
+
+			SystemSlice lastSlice = Visualizer.getLastSystemSlice();
+
+			if(lastSlice==null)
+			{
+				load = 0;
+			}
+			else
+			{
+				prev = lastSlice.getCpuInfo();
+
+				long totalDelta = ourProcCpu.getTotal() - prev.getTotal();
+            	long timeDelta = ourProcCpu.getLastTime() - prev.getLastTime();
+
+				load = 100. * totalDelta / timeDelta / cpuCount;
+			}
+
+			mem = sigar.getMem();
+			cpu = sigar.getCpuPerc();
+
 		} catch(SigarException se) {
-			System.out.println("Unable to gather CPU info");
+			System.out.println("Unable to gather process info");
 			return;
 		}
 
-		System.out.println(c.getIdle() + " : " + c.getTotal());
+		Visualizer.addSystemSlice( new SystemSlice( cpu.getCombined()*100, mem.getUsedPercent(), load, ourProcCpu, System.currentTimeMillis() ) );
 
 
 
 
-		//Visualizer.addSystemSlice(slice);
-
-		//System.out.println(slice.toString());
 
 	}
 
