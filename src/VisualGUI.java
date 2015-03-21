@@ -48,7 +48,7 @@ public class VisualGUI {
 	ChartPanel chartPanel4;
 	XYSeries[] seriesArray;
 	XYSeries[] seriesArray2;
-	TaskSeries[] taskSeriesArray;
+	static TaskSeries[] taskSeriesArray;
 	JCheckBox[] checkboxes; //array that hold all of the checkboxes
 	JFrame jframe;
 	GridBagConstraints gc;
@@ -374,7 +374,7 @@ public class VisualGUI {
 	
 	//This method takes in an ActivitySlice as a parameter and sends the data
 	//to the charts
-	public void addActivitySlice(ActivitySlice slice){
+	public static void addActivitySlice(ActivitySlice slice){
 		
 		
 	}
@@ -382,8 +382,20 @@ public class VisualGUI {
 	
 	//This method adds a critical section to the critical section bar chart and should be called by
 	//the Visualizer class when the Visualizer.leaveCriticalSection() method is used
-	public void addCriticalSection(int threadNum, Date enterTime, Date exitTime){
-		taskSeriesArray[threadNum].add(new Task("ldkj", enterTime, exitTime));
+	public static void addCriticalSection(String critialSection){
+		//taskSeriesArray[threadNum].add(new Task("ldkj", enterTime, exitTime));
+	}
+	
+	//called when a Thread enters a critical section
+	public static void enteringCS(String critalSection, long id, long time)
+	{
+		
+	}
+	
+	//called when a thread leaves a critical section
+	public static void leaveCS(String criticalSection, long id, long enter, long leave)
+	{
+		
 	}
 
 	//This method will be called by the library when the number of threads changes

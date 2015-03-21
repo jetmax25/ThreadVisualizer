@@ -74,6 +74,8 @@ public class Analyzer {
 		activityTable.put(num, temp);
 		
 		lastSlice = as;
+		
+		VisualGUI.addActivitySlice(as);
 	}
 
 	public static void addSystemSlice(SystemSlice ss)
@@ -178,15 +180,23 @@ public class Analyzer {
 	
 	public static void enteringCriticalSection(long id, String section, long time)
 	{
-		if(!criticalSection.containsKey(section)) criticalSection.put(section, new Hashtable<Long, long[]>());
+		//new critical sectiomn
+		if(!criticalSection.containsKey(section)){
+			criticalSection.put(section, new Hashtable<Long, long[]>());
+			VisualGUI.addCriticalSection(section);
+		}
 		long[] temp = {time, -1};
 		criticalSection.get(section).put(id, temp );
+		VisualGUI.enteringCS(section, id, time);
 	}
 	
 	public static void leavingCriticalSection(long id, String section, long time)
 	{
 		long[] temp = {criticalSection.get(section).get(id)[0], time}; 
 		criticalSection.get(section).put(id, temp );
+		
+		//tells the gui that it left
+		VisualGUI.leaveCS(section, id, temp[0], temp[1]);
 	}
 	
 	
