@@ -330,7 +330,7 @@ public class VisualGUI {
 
 	//This method gets the number of threads from the library and returns it
 	private static long getNumberOfThreads(){
-		return Visualizer.threadCount();
+		return Analyzer.threadCount();
 		//return 25;
 	}
 

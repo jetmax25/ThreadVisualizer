@@ -7,7 +7,7 @@ public class VisualThread extends Thread{
 	{
 		super();
 		this.id = super.getId();
-		Visualizer.addThread(this);
+		Analyzer.addThread(this);
 		this.addSlice("Initialized");	
 	
 	}
@@ -15,7 +15,7 @@ public class VisualThread extends Thread{
 	public VisualThread(Runnable runnable){
 		super(runnable);
 		this.id = super.getId();
-		Visualizer.addThread(this);
+		Analyzer.addThread(this);
 		this.addSlice("Initialized");
 	}
 
@@ -37,7 +37,7 @@ public class VisualThread extends Thread{
 	public void destroy() {
 		// TODO Auto-generated method stub
 		this.addSlice("destroy()");
-		Visualizer.removeThreads(this);
+		Analyzer.removeThreads(this);
 		super.destroy();
 	}
 
@@ -136,17 +136,17 @@ public class VisualThread extends Thread{
 	
 	public void addSlice(String s )
 	{
-		if(Visualizer.isAcceptingThread(this.id)) Visualizer.addSlice(new ActivitySlice(s, this.id, System.currentTimeMillis(), ObjectSizeFetcher.sizeOf(this) ));
+		if(Analyzer.isAcceptingThread(this.id)) Analyzer.addSlice(new ActivitySlice(s, this.id, System.currentTimeMillis(), ObjectSizeFetcher.sizeOf(this) ));
 	}
 	
 	public void enterCriticalSection(String section)
 	{
-		Visualizer.enteringCriticalSection(this.id, section, System.currentTimeMillis());
+		Analyzer.enteringCriticalSection(this.id, section, System.currentTimeMillis());
 	}
 	
 	public void leaveCriticalSection(String section)
 	{
-		Visualizer.leavingCriticalSection(this.id, section, System.currentTimeMillis());
+		Analyzer.leavingCriticalSection(this.id, section, System.currentTimeMillis());
 	}
 	
 }

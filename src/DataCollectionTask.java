@@ -36,7 +36,7 @@ public class DataCollectionTask implements Runnable {
 
 			int cpuCount = sigar.getCpuList().length;
 
-			SystemSlice lastSlice = Visualizer.getLastSystemSlice();
+			SystemSlice lastSlice = Analyzer.getLastSystemSlice();
 
 			if(lastSlice==null)
 			{
@@ -60,7 +60,7 @@ public class DataCollectionTask implements Runnable {
 			return;
 		}
 
-		Visualizer.addSystemSlice( new SystemSlice( cpu.getCombined()*100, mem.getUsedPercent(), load, ourProcCpu, System.currentTimeMillis() ) );
+		Analyzer.addSystemSlice( new SystemSlice( cpu.getCombined()*100, mem.getUsedPercent(), load, ourProcCpu, System.currentTimeMillis() ) );
 
 
 

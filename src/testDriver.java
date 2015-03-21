@@ -14,9 +14,9 @@ public class testDriver {
 			public void run(){
 				int i=0;
 				while(i<5){
-					x.enterCriticalSection("hello");
+					x.enterCriticalSection("alpha");
 					criticalMethod();
-					x.leaveCriticalSection("goodbye");
+					x.leaveCriticalSection("alpha");
 					i++;
 				}
 			}
@@ -27,9 +27,9 @@ public class testDriver {
 			public void run(){
 				int i=0;
 				while(i<5){
-					y.enterCriticalSection("whats up");
+					y.enterCriticalSection("beta");
 					criticalMethod();
-					y.leaveCriticalSection("see ya later");
+					y.leaveCriticalSection("beta");
 					i++;
 				}
 			}
@@ -39,7 +39,7 @@ public class testDriver {
 		for(int i = 0; i < 5; i++)
 		{
 			Thread.sleep(300);
-			Visualizer.printAll();
+			Analyzer.printAll();
 			System.out.println("*******************************");
 		}
 		
@@ -49,7 +49,7 @@ public class testDriver {
 		y.interrupt();
 		x.join();
 		y.join();
-		Visualizer.printAll();
+		Analyzer.printAll();
 		
 //		Thread.sleep(5000);
 //		VisualThread z = new VisualThread();
