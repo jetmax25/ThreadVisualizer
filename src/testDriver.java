@@ -9,6 +9,8 @@ public class testDriver {
 	static VisualThread y;
 	
 	public static void main(String[] args) throws InterruptedException {
+		
+		
 		// TODO Auto-generated method stub
 		x = new VisualThread(new Runnable(){
 			public void run(){
