@@ -15,11 +15,14 @@ public class DataCollectionTask implements Runnable {
 
 		long pid = sigar.getPid();
 
+		//holds info specific to our process
 		ProcCpu ourProcCpu;
 		ProcMem ourProcMem;
 
+		//previous process info to calculate load
 		ProcCpu prev;
 
+		//overall system info
 		Mem mem;
 		CpuPerc cpu;
 
@@ -37,9 +40,9 @@ public class DataCollectionTask implements Runnable {
 
 			if(lastSlice==null)
 			{
-				load = 0;
+				load = 0; //first instance, can't get load info
 			}
-			else
+			else //can actually get the load using previous info
 			{
 				prev = lastSlice.getCpuInfo();
 

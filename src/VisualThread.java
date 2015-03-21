@@ -1,3 +1,4 @@
+import java.lang.instrument.Instrumentation;
 
 public class VisualThread extends Thread{
 	
@@ -7,8 +8,15 @@ public class VisualThread extends Thread{
 		super();
 		this.id = super.getId();
 		Visualizer.addThread(this);
+		this.addSlice("Initialized");	
+	
+	}
+	
+	public VisualThread(Runnable runnable){
+		super(runnable);
+		this.id = super.getId();
+		Visualizer.addThread(this);
 		this.addSlice("Initialized");
-		
 	}
 
 	@Override
@@ -128,6 +136,32 @@ public class VisualThread extends Thread{
 	
 	public void addSlice(String s )
 	{
-		Visualizer.addSlice(new ActivitySlice(s, this.id, System.currentTimeMillis()));
+		if(Visualizer.isAcceptingThread(this.id)) Visualizer.addSlice(new ActivitySlice(s, this.id, System.currentTimeMillis(), ObjectSizeFetcher.sizeOf(this) ));
 	}
+	
+	public void enterCriticalSection(String section)
+	{
+		Visualizer.enteringCriticalSection(this.id, section, System.currentTimeMillis());
+	}
+	
+	public void leaveCriticalSection(String section)
+	{
+		Visualizer.leavingCriticalSection(this.id, section, System.currentTimeMillis());
+	}
+	
+}
+
+
+
+
+ class ObjectSizeFetcher {
+    private static Instrumentation instrumentation;
+
+    public static void premain(String args, Instrumentation inst) {
+        instrumentation = inst;
+    }
+
+    public static long sizeOf(Object o) {
+        return instrumentation.getObjectSize(o);
+    }
 }

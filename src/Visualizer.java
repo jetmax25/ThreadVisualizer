@@ -9,16 +9,20 @@ import java.util.concurrent.TimeUnit;
 public class Visualizer {
 
 	private static Hashtable<Long,Thread> threadTable = new Hashtable<Long, Thread>();
-	private static Hashtable<Long,ArrayList<ActivitySlice>> activityTable = new Hashtable<Long, ArrayList<ActivitySlice>>();
-	
-	private static ArrayList<SystemSlice> systemList = new ArrayList<SystemSlice>();
+	private  static Hashtable<Long,ArrayList<ActivitySlice>> activityTable = new Hashtable<Long, ArrayList<ActivitySlice>>();
+	private static Hashtable<String, Hashtable<Long, long[]>> criticalSection = new Hashtable<String, Hashtable<Long, long[]>>();
 
+	private static ArrayList<SystemSlice> systemList = new ArrayList<SystemSlice>(); 
+
+	private static ActivitySlice lastSlice = null; 
+	//accepting thread table
+	private static Hashtable<Long,Long> acceptingTable = new Hashtable<Long, Long>();
 	//threads currently active
-	private static long activeThreads = 0; 
+	private static int activeThreads = 0; 
 	//all threads created ever
-	private static long totalThreads = 0; 
+	private static int totalThreads = 0; 
 	//most threads ever active
-	private static long maxThreads  = 0; 
+	private static int maxThreads  = 0; 
 	private static long start = System.currentTimeMillis(); 
 	
 	//rate at which the Visualizer logs CPU/Memory Usage, watched variables, etc.
@@ -27,6 +31,14 @@ public class Visualizer {
 	//kicks off our data collection at every tickRate interval
 	private static ScheduledExecutorService dataService = Executors.newSingleThreadScheduledExecutor();
 	private static boolean serviceStarted = false;
+
+	private static VisualGUI gui = new VisualGUI();	
+	private static enum AcceptState{
+		none, all, some
+	}
+	
+	private static AcceptState acceptState = AcceptState.none; 
+
 	
 	//Threads will call this method to add themselves to the ArrayList
 	public static void addThread(Thread th)
@@ -60,6 +72,8 @@ public class Visualizer {
 		temp.add(as);
 		//save it
 		activityTable.put(num, temp);
+		
+		lastSlice = as;
 	}
 
 	public static void addSystemSlice(SystemSlice ss)
@@ -102,10 +116,54 @@ public class Visualizer {
 	{
 		dataService.shutdown();
 	}
+	
+	public static void startActivityNotifications()
+	{
+		acceptState = AcceptState.all;
+	}
+	
+	public static void stopActivityNotifications()
+	{
+		acceptState = AcceptState.none;
+		acceptingTable.clear();
+	}
+	
+	public static void startActivityNotifications(long id){
+		acceptingTable.put(id, id);
+	}
+	
+	public static void stopActivityNotifications(long id){
+		acceptingTable.remove(id);
+	}
+	
+	public static boolean isAcceptingThread(long id)
+	{
+		if(acceptState.equals(AcceptState.none)) return false;
+		if(acceptingTable.get(id) != null) return true; 
+		return false; 
+	}
+	
+	public static int getTotalThreads()
+	{
+		return totalThreads;
+	}
 
+	public static ActivitySlice getActivity()
+	{
+		return lastSlice; 
+	}
+	
+	public static ActivitySlice getActivity(long id)
+	{
+		if(!activityTable.containsKey(id)) return null; 
+		
+		ArrayList<ActivitySlice> temp = activityTable.get(id);
+		return temp.get(temp.size() - 1);
+		
+	}
 
 	//used by DataCollectionTask to calculate the current load
-	public static SystemSlice getLastSystemSlice()
+	public static synchronized SystemSlice getLastSystemSlice()
 	{
 		if(systemList.isEmpty())
 			return null;
@@ -117,5 +175,19 @@ public class Visualizer {
 	{
 		return systemList;
 	}
-
+	
+	public static void enteringCriticalSection(long id, String section, long time)
+	{
+		if(!criticalSection.containsKey(section)) criticalSection.put(section, new Hashtable<Long, long[]>());
+		long[] temp = {time, -1};
+		criticalSection.get(section).put(id, temp );
+	}
+	
+	public static void leavingCriticalSection(long id, String section, long time)
+	{
+		long[] temp = {criticalSection.get(section).get(id)[0], time}; 
+		criticalSection.get(section).put(id, temp );
+	}
+	
+	
 }
