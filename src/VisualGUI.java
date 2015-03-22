@@ -4,6 +4,7 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.Random;
 
@@ -17,7 +18,6 @@ import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.ChartUtilities;
 import org.jfree.chart.JFreeChart;
-import org.jfree.chart.axis.DateAxis;
 import org.jfree.chart.axis.NumberAxis;
 import org.jfree.chart.axis.SymbolAxis;
 import org.jfree.chart.plot.PlotOrientation;
@@ -33,9 +33,10 @@ import org.jfree.data.xy.XYSeriesCollection;
 
 
 public class VisualGUI {
-	XYSeriesCollection dataset;
-	XYSeriesCollection dataset2;
-	TaskSeriesCollection data4;
+	XYSeriesCollection dataset = new XYSeriesCollection();
+	XYSeriesCollection dataset2 = new XYSeriesCollection();
+	XYSeriesCollection dataset3 = new XYSeriesCollection();
+	static TaskSeriesCollection data4 = new TaskSeriesCollection();
 	XYTaskDataset dataset4;
 	JFreeChart chart; //CPU usage chart
 	JFreeChart chart2; //Memory usage chart
@@ -48,7 +49,8 @@ public class VisualGUI {
 	ChartPanel chartPanel4;
 	XYSeries[] seriesArray;
 	XYSeries[] seriesArray2;
-	static TaskSeries[] taskSeriesArray;
+	//static TaskSeries[] taskSeriesArray = new TaskSeries[(int) getNumberOfThreads()];
+	static ArrayList<TaskSeries> taskSeriesArray = new ArrayList<TaskSeries>();
 	JCheckBox[] checkboxes; //array that hold all of the checkboxes
 	JFrame jframe;
 	GridBagConstraints gc;
@@ -59,76 +61,47 @@ public class VisualGUI {
 	XYPlot plot1;
 	XYPlot plot2;
 	XYPlot plot3;
-	XYPlot plot4;
+	static XYPlot plot4;
 	NumberAxis domain1;
 	NumberAxis domain2;
 	NumberAxis domain3;
 	NumberAxis domain4;
 
 	XYBarRenderer renderer4;
+	
+	static long programStartTime = System.currentTimeMillis();
+	
+	public static ArrayList<VisualThread> threads = new ArrayList<VisualThread>();
+	
+	static ArrayList<StoredTask> storedTasks = new ArrayList<StoredTask>();
 
 	protected VisualGUI(){
 
 		
 		Thread guiThread = new Thread(new Runnable(){
 			public void run(){
+				
+				System.out.printf("numThreads: %d\n", (int)getNumberOfThreads());												
+				
 				// create datasets
-				dataset = new XYSeriesCollection();	
+				//dataset = new XYSeriesCollection();	
 
-				dataset2 = new XYSeriesCollection();
+				//dataset2 = new XYSeriesCollection();
 
-				data4 = new TaskSeriesCollection();
+				//data4 = new TaskSeriesCollection();
 				dataset4 = new XYTaskDataset(data4);
-
+				
 
 				// create charts
 				chart = ChartFactory.createXYLineChart("CPU Usage", "Time", "Percentage", dataset, PlotOrientation.VERTICAL, true, true, false);
+				// create a panel to put the chart in
+				chartPanel = new ChartPanel(chart);
 				currChart = chart;
 
 				plot1 = (XYPlot) chart.getXYPlot();
 				domain1 = (NumberAxis) plot1.getDomainAxis();
 				domain1.setRange(0,10);
-
-				chart2 = ChartFactory.createXYLineChart("Memory Usage", "Time", "Percentage", dataset2, PlotOrientation.VERTICAL, true, true, false);
-				plot2 = (XYPlot) chart2.getXYPlot();
-				domain2 = (NumberAxis) plot2.getDomainAxis();
-				domain2.setRange(0,10);
 				
-				chart4 = ChartFactory.createXYBarChart("Critical Sections", "Thread", false, "Time", dataset4, PlotOrientation.HORIZONTAL, true, true, false);
-
-
-				//create labels for the critical sections chart y-axis
-				String[] chart4AxisLabels = new String[(int)getNumberOfThreads()];
-				for(int j=0; j<chart4AxisLabels.length; j++){
-					chart4AxisLabels[j] = "Thread " + (j+1);
-				}
-				SymbolAxis symbolaxis = new SymbolAxis("Series", chart4AxisLabels);
-
-				//set the domain and range of the critical sections axes
-				plot4 = chart4.getXYPlot();
-				plot4.setDomainAxis(symbolaxis);
-				plot4.setRangeAxis(new DateAxis("Time"));
-
-				//not entirely sure why we need these three lines but its started working when I put them in
-				renderer4 = (XYBarRenderer) plot4.getRenderer();
-				renderer4.setUseYInterval(true);
-				ChartUtilities.applyCurrentTheme(chart4);
-
-
-				//this is for chart4 *****************************************************************************
-				taskSeriesArray = new TaskSeries[(int)getNumberOfThreads()];								//****
-				for(int i=0; i<taskSeriesArray.length; i++){												//****
-					taskSeriesArray[i] = new TaskSeries("Thread" + Integer.toString(i+1));					//****
-					//The Task object has the parameters Task(String, Date start, Date end)					//****
-					//The class Date represents a specific instant in time, with millisecond precision.		//****
-					taskSeriesArray[i].add(new Task("herro", new Date(2*(i+1)), new Date(3*(i+1))));		//****
-					data4.add(taskSeriesArray[i]);															//****
-				}																							//****
-				//************************************************************************************************
-
-				// create a panel to put the chart in
-				chartPanel = new ChartPanel(chart);
-
 				//This is for chart1 and chart2 ******************************************
 				seriesArray = new XYSeries[(int)getNumberOfThreads()];				  //**
 				seriesArray2 = new XYSeries[(int) getNumberOfThreads()];			  //**
@@ -139,15 +112,49 @@ public class VisualGUI {
 					dataset2.addSeries(seriesArray2[i]);    						  //**
 				}																	  //**
 				//************************************************************************
+				
 
-				chartPanel.setVisible(true);
+				chart2 = ChartFactory.createXYLineChart("Memory Usage", "Time", "Percentage", dataset2, PlotOrientation.VERTICAL, true, true, false);
+				plot2 = (XYPlot) chart2.getXYPlot();
+				domain2 = (NumberAxis) plot2.getDomainAxis();
+				domain2.setRange(0,10);
 				
+				chart3 = ChartFactory.createScatterPlot("Thread Lifecycle", "Time", "Actions", dataset3);
+				String[] chart3AxisLabels = {"interrupted", "Joined", "Created", "Destroyed", "running"};
+				SymbolAxis symbolaxis2 = new SymbolAxis("Series", chart3AxisLabels);
+				plot3 = chart3.getXYPlot();
+				plot3.setRangeAxis(symbolaxis2);
+				plot3.setDomainAxis(new NumberAxis("Time (Milliseconds"));
 				
+				chart4 = ChartFactory.createXYBarChart("Critical Sections", "Thread", false, "Time", dataset4, PlotOrientation.HORIZONTAL, true, true, false);
+
+					
+				//create labels for the critical sections chart y-axis
+				String[] chart4AxisLabels = new String[(int)getNumberOfThreads()];
+				for(int j=0; j<chart4AxisLabels.length; j++){
+					chart4AxisLabels[j] = "Thread " + (j+1);
+				}
+				SymbolAxis symbolaxis = new SymbolAxis("Series", chart4AxisLabels);
+
+				//set the domain and range of the critical sections axes
+				plot4 = chart4.getXYPlot();
+				plot4.setDomainAxis(symbolaxis);
+				plot4.setRangeAxis(new NumberAxis("Time (Milliseconds)"));
+
+				//not entirely sure why we need these three lines but its started working when I put them in
+				renderer4 = (XYBarRenderer) plot4.getRenderer();
+				renderer4.setUseYInterval(true);
+				ChartUtilities.applyCurrentTheme(chart4);
+				
+				//addStoredTasks();
+				
+				System.out.println("taskSeriesArray filled");
+							
 
 				//creating JButtons for JPanel 1
 				JButton button1 = new JButton("CPU Visualizer");
 				JButton button2 = new JButton("Memory Visualizer");
-				JButton button3 = new JButton("Thread Sleep Time");
+				JButton button3 = new JButton("Thread Lifecycle");
 				JButton button4 = new JButton("Thread Critical Sections");
 
 
@@ -185,7 +192,12 @@ public class VisualGUI {
 
 				button3.addActionListener(new ActionListener(){
 					public void actionPerformed(ActionEvent e){
-						//add code here
+						chartPanel3 = new ChartPanel(chart3);
+						jpanel2.removeAll();
+						jpanel2.add(chartPanel3);
+						jpanel2.revalidate();
+						jpanel2.repaint();
+						currChart = chart3;
 					}
 				});
 
@@ -295,8 +307,8 @@ public class VisualGUI {
 						int i;
 						while(counter < 100){
 							for(i=0; i<seriesArray.length; i++){
-								seriesArray[i].add(counter, returnRandom());
-								seriesArray2[i].add(counter, (returnRandom()*2)%100);
+								addCpuUsage(counter, i);
+								addMemoryUsage(counter, i);
 								if(counter > 10){
 									domain1.setRange(counter-10, counter);
 									domain2.setRange(counter-10, counter);
@@ -320,8 +332,16 @@ public class VisualGUI {
 	}
 
 
+	public void addCpuUsage(int counter, int index){
+		seriesArray[index].add(counter, returnRandom());
+	}
+	
+	public void addMemoryUsage(int counter, int index){
+		seriesArray2[index].add(counter, (returnRandom()*2)%100);
+	}
+	
 	//This method returns a random integer
-	private static int returnRandom(){
+	public static int returnRandom(){
 		Random rn = new Random();
 		int answer = rn.nextInt(100) + 1;
 		return answer;
@@ -331,7 +351,7 @@ public class VisualGUI {
 	//This method gets the number of threads from the library and returns it
 	private static long getNumberOfThreads(){
 		return Analyzer.threadCount();
-		//return 25;
+		//return 3;
 	}
 
 
@@ -375,15 +395,43 @@ public class VisualGUI {
 	//This method takes in an ActivitySlice as a parameter and sends the data
 	//to the charts
 	public static void addActivitySlice(ActivitySlice slice){
-		
+		System.out.println("Activity Slice: " + slice.getDescription());
 		
 	}
 	
 	
 	//This method adds a critical section to the critical section bar chart and should be called by
 	//the Visualizer class when the Visualizer.leaveCriticalSection() method is used
-	public static void addCriticalSection(String critialSection){
-		//taskSeriesArray[threadNum].add(new Task("ldkj", enterTime, exitTime));
+	public static void addCriticalSection(String criticalSection, long id, long enter, long leave){
+		//System.out.println("Critical Section Added");
+		Date enterTime = new Date(enter-programStartTime);
+		Date exitTime = new Date(leave-programStartTime);
+		Task thisTask = new Task(criticalSection, enterTime, exitTime);
+		int index = getTaskSeriesID(id);
+		//System.out.println(id + " " + enter + " " + leave);
+		try{taskSeriesArray.get(index).add(new Task(criticalSection, enterTime, exitTime));}
+		catch(NullPointerException n){
+			storedTasks.add(new StoredTask(thisTask, index));
+		}		
+	}
+	
+	
+	public static void addStoredTasks(){
+		for(int i=0; i<storedTasks.size(); i++){
+			StoredTask thisStoredTask = storedTasks.get(i);
+			Task newTask = thisStoredTask.task;
+			taskSeriesArray.get(thisStoredTask.index).add(newTask);
+		}
+	}
+	
+	//returns -1 if thread with given id does not exist
+	public static int getTaskSeriesID(long id){
+		for(int i=0; i<threads.size(); i++){
+			VisualThread thisThread = threads.get(i);
+			if(thisThread.getId() == id)
+				return i;
+		}
+		return -1;
 	}
 	
 	//called when a Thread enters a critical section
@@ -399,8 +447,11 @@ public class VisualGUI {
 	}
 
 	//This method will be called by the library when the number of threads changes
-	public void numThreadsChanged(int newNumThreads){
-		//code goes here
+	public static void threadAdded(VisualThread newThread){
+		threads.add(newThread);
+		TaskSeries task = new TaskSeries("Thread "+ Long.toString(getTaskSeriesID(newThread.getId())+1));
+		taskSeriesArray.add(task);
+		data4.add(task);
 	}
 
 }
