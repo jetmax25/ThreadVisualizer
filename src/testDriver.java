@@ -41,13 +41,11 @@ public class testDriver {
 		};
 		y.start();
 		
-		
 		x.interrupt();
-		System.out.println("interrupt created");
 		y.interrupt();
 		x.join();
 		y.join();
-		Analyzer.printAll();
+		//Analyzer.printAll();
 		
 	}
 	

@@ -64,6 +64,8 @@ public class Analyzer {
 	
 	public static void addSlice(ActivitySlice as)
 	{
+		//System.out.println("step3");
+		
 		//get prev info
 		long num = as.getThread();
 		ArrayList<ActivitySlice> temp = activityTable.get(num);
@@ -141,6 +143,7 @@ public class Analyzer {
 	{
 		if(acceptState.equals(AcceptState.none)) return false;
 		if(acceptingTable.get(id) != null) return true; 
+		if(acceptState.equals(AcceptState.all)) return true;
 		return false; 
 	}
 	
