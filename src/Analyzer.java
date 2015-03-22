@@ -1,6 +1,5 @@
 import java.util.ArrayList;
 import java.util.Hashtable;
-
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -28,11 +27,11 @@ public class Analyzer {
 	//rate at which the Visualizer logs CPU/Memory Usage, watched variables, etc.
 	private static int tickRate = 500;
 
+	
 	//kicks off our data collection at every tickRate interval
 	private static ScheduledExecutorService dataService = Executors.newSingleThreadScheduledExecutor();
 	private static boolean serviceStarted = false;
 
-	private static VisualGUI gui = new VisualGUI();	
 	private static enum AcceptState{
 		none, all, some
 	}
@@ -183,7 +182,7 @@ public class Analyzer {
 		//new critical sectiomn
 		if(!criticalSection.containsKey(section)){
 			criticalSection.put(section, new Hashtable<Long, long[]>());
-			VisualGUI.addCriticalSection(section);
+			//VisualGUI.addCriticalSection(section);
 		}
 		long[] temp = {time, -1};
 		criticalSection.get(section).put(id, temp );
@@ -197,6 +196,8 @@ public class Analyzer {
 		
 		//tells the gui that it left
 		VisualGUI.leaveCS(section, id, temp[0], temp[1]);
+		
+		VisualGUI.addCriticalSection(section, id, temp[0], temp[1]);
 	}
 	
 	

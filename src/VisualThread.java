@@ -7,6 +7,7 @@ public class VisualThread extends Thread{
 	{
 		super();
 		this.id = super.getId();
+		VisualGUI.threadAdded(this);
 		Analyzer.addThread(this);
 		this.addSlice("Initialized");	
 	
@@ -123,6 +124,7 @@ public class VisualThread extends Thread{
 	@Override
 	public synchronized void start() {
 		// TODO Auto-generated method stub
+		System.out.println("thread started");
 		this.addSlice("start()");
 		super.start();
 	}
@@ -137,6 +139,7 @@ public class VisualThread extends Thread{
 	public void addSlice(String s )
 	{
 		if(Analyzer.isAcceptingThread(this.id)) Analyzer.addSlice(new ActivitySlice(s, this.id, System.currentTimeMillis(), ObjectSizeFetcher.sizeOf(this) ));
+		//System.out.println("interrupt passed to analyzer"); 
 	}
 	
 	public void enterCriticalSection(String section)

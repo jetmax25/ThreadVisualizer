@@ -28,4 +28,8 @@ public class ActivitySlice {
 	public long getTime(){
 		return time; 
 	}
+	
+	public String getDescription(){
+		return description;
+	}
 }
