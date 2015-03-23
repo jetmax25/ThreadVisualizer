@@ -1,3 +1,4 @@
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -48,8 +49,9 @@ public class VisualGUI {
 	ChartPanel chartPanel3;
 	ChartPanel chartPanel4;
 	XYSeries[] seriesArray;
+	XYSeries overallSeries1 = new XYSeries("Overall");
 	XYSeries[] seriesArray2;
-	//static TaskSeries[] taskSeriesArray = new TaskSeries[(int) getNumberOfThreads()];
+	static XYSeries[] seriesArray3 = new XYSeries[3];
 	static ArrayList<TaskSeries> taskSeriesArray = new ArrayList<TaskSeries>();
 	JCheckBox[] checkboxes; //array that hold all of the checkboxes
 	JFrame jframe;
@@ -81,6 +83,18 @@ public class VisualGUI {
 		Thread guiThread = new Thread(new Runnable(){
 			public void run(){
 				
+				Analyzer.startActivityNotifications();
+
+//				seriesArray3 = new XYSeries[(int)getNumberOfThreads()];
+				//This is for chart3 **************************************************
+				for(int i=0; i<seriesArray3.length; i++){
+					seriesArray3[i] = new XYSeries("Thread "+ Integer.toString((i+1)));
+					dataset3.addSeries(seriesArray3[i]);
+				}
+				//********************************************************************
+				
+				//seriesArray3[0].add(300, 0D);
+				
 				System.out.printf("numThreads: %d\n", (int)getNumberOfThreads());												
 				
 				// create datasets
@@ -101,7 +115,8 @@ public class VisualGUI {
 				plot1 = (XYPlot) chart.getXYPlot();
 				domain1 = (NumberAxis) plot1.getDomainAxis();
 				domain1.setRange(0,10);
-				
+				plot1.setBackgroundPaint(Color.BLACK);
+
 				//This is for chart1 and chart2 ******************************************
 				seriesArray = new XYSeries[(int)getNumberOfThreads()];				  //**
 				seriesArray2 = new XYSeries[(int) getNumberOfThreads()];			  //**
@@ -118,17 +133,18 @@ public class VisualGUI {
 				plot2 = (XYPlot) chart2.getXYPlot();
 				domain2 = (NumberAxis) plot2.getDomainAxis();
 				domain2.setRange(0,10);
+				plot2.setBackgroundPaint(Color.BLACK);
 				
 				chart3 = ChartFactory.createScatterPlot("Thread Lifecycle", "Time", "Actions", dataset3);
-				String[] chart3AxisLabels = {"interrupted", "Joined", "Created", "Destroyed", "running"};
+				String[] chart3AxisLabels = {"Interrupted", "Joined", "Created", "Destroyed", "Started"};
 				SymbolAxis symbolaxis2 = new SymbolAxis("Series", chart3AxisLabels);
 				plot3 = chart3.getXYPlot();
 				plot3.setRangeAxis(symbolaxis2);
-				plot3.setDomainAxis(new NumberAxis("Time (Milliseconds"));
+				plot3.setDomainAxis(new NumberAxis("Time (Milliseconds)"));
+
 				
 				chart4 = ChartFactory.createXYBarChart("Critical Sections", "Thread", false, "Time", dataset4, PlotOrientation.HORIZONTAL, true, true, false);
-
-					
+				
 				//create labels for the critical sections chart y-axis
 				String[] chart4AxisLabels = new String[(int)getNumberOfThreads()];
 				for(int j=0; j<chart4AxisLabels.length; j++){
@@ -147,10 +163,7 @@ public class VisualGUI {
 				ChartUtilities.applyCurrentTheme(chart4);
 				
 				//addStoredTasks();
-				
-				System.out.println("taskSeriesArray filled");
-							
-
+											
 				//creating JButtons for JPanel 1
 				JButton button1 = new JButton("CPU Visualizer");
 				JButton button2 = new JButton("Memory Visualizer");
@@ -258,6 +271,21 @@ public class VisualGUI {
 					});
 					jpanel3.add(checkboxes[i]);
 				}
+				
+				JCheckBox overallCheckBox = new JCheckBox("Overall", true);
+				overallCheckBox.addActionListener(new ActionListener(){
+					public void actionPerformed(ActionEvent e){
+						JCheckBox thisBox = (JCheckBox) e.getSource();
+						if(thisBox.isSelected() == false){
+							//removeSeries
+						}
+						else{
+							//addSeries
+						}
+					}
+				});
+				jpanel3.add(overallCheckBox);
+				
 				jpanel3.setVisible(true);
 
 
@@ -305,7 +333,7 @@ public class VisualGUI {
 					public void run(){
 						int counter = 0;
 						int i;
-						while(counter < 100){
+						while(true){
 							for(i=0; i<seriesArray.length; i++){
 								addCpuUsage(counter, i);
 								addMemoryUsage(counter, i);
@@ -334,6 +362,7 @@ public class VisualGUI {
 
 	public void addCpuUsage(int counter, int index){
 		seriesArray[index].add(counter, returnRandom());
+		
 	}
 	
 	public void addMemoryUsage(int counter, int index){
@@ -395,10 +424,22 @@ public class VisualGUI {
 	//This method takes in an ActivitySlice as a parameter and sends the data
 	//to the charts
 	public static void addActivitySlice(ActivitySlice slice){
-		System.out.println("Activity Slice: " + slice.getDescription());
+		//System.out.println("Activity Slice: " + slice.getDescription());
+		if(slice.getDescription().equals("Initialized")){
+			seriesArray3[getTaskSeriesID(slice.getThread())].add(slice.getTime() - programStartTime, 2D);
+		}
+		else if(slice.getDescription().equals("start()")){
+			seriesArray3[getTaskSeriesID(slice.getThread())].add(slice.getTime() - programStartTime, 4D);
+		}
+		else if(slice.getDescription().equals("interrupt()")){
+			seriesArray3[getTaskSeriesID(slice.getThread())].add(slice.getTime() - programStartTime, 0D);
+		}
+		else if(slice.getDescription().equals("destroy()")){
+			seriesArray3[getTaskSeriesID(slice.getThread())].add(slice.getTime() - programStartTime, 3D);
+		}
 		
 	}
-	
+	//seriesArray3[0].add(300, 0D);
 	
 	//This method adds a critical section to the critical section bar chart and should be called by
 	//the Visualizer class when the Visualizer.leaveCriticalSection() method is used

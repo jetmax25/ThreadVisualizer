@@ -3,12 +3,12 @@ import java.util.concurrent.locks.ReentrantLock;
 
 
 public class testDriver {
-	private static VisualGUI gui = new VisualGUI();	
 
 
 	static Lock lock = new ReentrantLock();
 	static VisualThread x;
 	static VisualThread y;
+	static VisualThread z;
 	
 	public static void main(String[] args) throws InterruptedException {
 				
@@ -25,7 +25,12 @@ public class testDriver {
 				}
 			}
 		};
+		try{Thread.sleep(10);}
+		catch(InterruptedException e){}
 		x.start();
+		
+		try{Thread.sleep(10);}
+		catch(InterruptedException e){}
 		
 		y = new VisualThread(){
 			@Override
@@ -39,15 +44,57 @@ public class testDriver {
 				}
 			}
 		};
+		try{Thread.sleep(10);}
+		catch(InterruptedException e){}
 		y.start();
+		
+		try{Thread.sleep(10);}
+		catch(InterruptedException e){}
+		
+		
+		z = new VisualThread(){
+			@Override
+			public void run(){
+				int i=0;
+				while(i<5){
+					try{Thread.sleep(VisualGUI.returnRandom()*10);}
+					catch(InterruptedException e){}
+					criticalMethod(z);
+					i++;
+				}
+			}
+		};
+		try{Thread.sleep(10);}
+		catch(InterruptedException e){}
+		z.start();
+		
+		
 		
 		
 		x.interrupt();
-		System.out.println("interrupt created");
+		try{Thread.sleep(10);}
+		catch(InterruptedException e){}
 		y.interrupt();
+		try{Thread.sleep(10);}
+		catch(InterruptedException e){}
 		x.join();
 		y.join();
-		Analyzer.printAll();
+		//Analyzer.printAll();
+		
+//		try{Thread.sleep(VisualGUI.returnRandom()*10);}
+//		catch(InterruptedException e){}
+//		
+//		y.destroy();
+//		
+//		try{Thread.sleep(VisualGUI.returnRandom()*10);}
+//		catch(InterruptedException e){}
+//		
+//		z.destroy();
+//		
+//		try{Thread.sleep(VisualGUI.returnRandom()*10);}
+//		catch(InterruptedException e){}
+//		
+//		x.destroy();
 		
 	}
 	

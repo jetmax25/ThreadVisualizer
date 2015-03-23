@@ -138,8 +138,8 @@ public class VisualThread extends Thread{
 	
 	public void addSlice(String s )
 	{
-		if(Analyzer.isAcceptingThread(this.id)) Analyzer.addSlice(new ActivitySlice(s, this.id, System.currentTimeMillis(), ObjectSizeFetcher.sizeOf(this) ));
-		//System.out.println("interrupt passed to analyzer"); 
+		if(Analyzer.isAcceptingThread(this.id))  Analyzer.addSlice(new ActivitySlice(s, this.id, System.currentTimeMillis()/*, ObjectSizeFetcher.sizeOf(this) */));
+		//System.out.println("Step 2"); }
 	}
 	
 	public void enterCriticalSection(String section)

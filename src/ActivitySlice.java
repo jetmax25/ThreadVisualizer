@@ -7,7 +7,7 @@ public class ActivitySlice {
 	private long objectSize;
 	
 	
-	public ActivitySlice(String descript, long id, long time, long objectSize)
+	public ActivitySlice(String descript, long id, long time/*, long objectSize*/)
 	{
 		description = descript;
 		threadNum = id;
