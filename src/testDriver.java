@@ -9,6 +9,7 @@ public class testDriver {
 	static Lock lock = new ReentrantLock();
 	static VisualThread x;
 	static VisualThread y;
+	static VisualThread z;
 	
 	public static void main(String[] args) throws InterruptedException {
 				
@@ -40,6 +41,24 @@ public class testDriver {
 			}
 		};
 		y.start();
+		
+		
+		z = new VisualThread(){
+			@Override
+			public void run(){
+				int i=0;
+				while(i<5){
+					try{Thread.sleep(VisualGUI.returnRandom()*10);}
+					catch(InterruptedException e){}
+					criticalMethod(z);
+					i++;
+				}
+			}
+		};
+		z.start();
+		
+		
+		
 		
 		x.interrupt();
 		y.interrupt();

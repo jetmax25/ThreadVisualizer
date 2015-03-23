@@ -1,3 +1,4 @@
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -50,7 +51,7 @@ public class VisualGUI {
 	XYSeries[] seriesArray;
 	XYSeries overallSeries1 = new XYSeries("Overall");
 	XYSeries[] seriesArray2;
-	static XYSeries[] seriesArray3 = new XYSeries[2];
+	static XYSeries[] seriesArray3 = new XYSeries[3];
 	static ArrayList<TaskSeries> taskSeriesArray = new ArrayList<TaskSeries>();
 	JCheckBox[] checkboxes; //array that hold all of the checkboxes
 	JFrame jframe;
@@ -84,6 +85,7 @@ public class VisualGUI {
 				
 				Analyzer.startActivityNotifications();
 
+//				seriesArray3 = new XYSeries[(int)getNumberOfThreads()];
 				//This is for chart3 **************************************************
 				for(int i=0; i<seriesArray3.length; i++){
 					seriesArray3[i] = new XYSeries("Thread "+ Integer.toString((i+1)));
@@ -113,7 +115,8 @@ public class VisualGUI {
 				plot1 = (XYPlot) chart.getXYPlot();
 				domain1 = (NumberAxis) plot1.getDomainAxis();
 				domain1.setRange(0,10);
-				
+				plot1.setBackgroundPaint(Color.BLACK);
+
 				//This is for chart1 and chart2 ******************************************
 				seriesArray = new XYSeries[(int)getNumberOfThreads()];				  //**
 				seriesArray2 = new XYSeries[(int) getNumberOfThreads()];			  //**
@@ -130,6 +133,7 @@ public class VisualGUI {
 				plot2 = (XYPlot) chart2.getXYPlot();
 				domain2 = (NumberAxis) plot2.getDomainAxis();
 				domain2.setRange(0,10);
+				plot2.setBackgroundPaint(Color.BLACK);
 				
 				chart3 = ChartFactory.createScatterPlot("Thread Lifecycle", "Time", "Actions", dataset3);
 				String[] chart3AxisLabels = {"interrupted", "Joined", "Created", "Destroyed", "running"};
@@ -137,8 +141,7 @@ public class VisualGUI {
 				plot3 = chart3.getXYPlot();
 				plot3.setRangeAxis(symbolaxis2);
 				plot3.setDomainAxis(new NumberAxis("Time (Milliseconds)"));
-				
-				
+
 				
 				chart4 = ChartFactory.createXYBarChart("Critical Sections", "Thread", false, "Time", dataset4, PlotOrientation.HORIZONTAL, true, true, false);
 				
