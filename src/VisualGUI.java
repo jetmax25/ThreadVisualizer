@@ -434,6 +434,9 @@ public class VisualGUI {
 		else if(slice.getDescription().equals("interrupt()")){
 			seriesArray3[getTaskSeriesID(slice.getThread())].add(slice.getTime() - programStartTime, 0D);
 		}
+		else if(slice.getDescription().equals("destroy()")){
+			seriesArray3[getTaskSeriesID(slice.getThread())].add(slice.getTime() - programStartTime, 3D);
+		}
 		
 	}
 	//seriesArray3[0].add(300, 0D);
