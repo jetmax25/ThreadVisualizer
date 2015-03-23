@@ -270,19 +270,19 @@ public class VisualGUI {
 					jpanel3.add(checkboxes[i]);
 				}
 				
-				JCheckBox overallCheckBox = new JCheckBox("Overall", true);
-				overallCheckBox.addActionListener(new ActionListener(){
-					public void actionPerformed(ActionEvent e){
-						JCheckBox thisBox = (JCheckBox) e.getSource();
-						if(thisBox.isSelected() == false){
-							//removeSeries
-						}
-						else{
-							//addSeries
-						}
-					}
-				});
-				jpanel3.add(overallCheckBox);
+//				JCheckBox overallCheckBox = new JCheckBox("Overall", true);
+//				overallCheckBox.addActionListener(new ActionListener(){
+//					public void actionPerformed(ActionEvent e){
+//						JCheckBox thisBox = (JCheckBox) e.getSource();
+//						if(thisBox.isSelected() == false){
+//							//removeSeries
+//						}
+//						else{
+//							//addSeries
+//						}
+//					}
+//				});
+//				jpanel3.add(overallCheckBox);
 				
 				jpanel3.setVisible(true);
 
