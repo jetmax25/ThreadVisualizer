@@ -34,7 +34,7 @@ import org.jfree.data.xy.XYSeriesCollection;
 
 
 public class VisualGUI {
-	XYSeriesCollection dataset = new XYSeriesCollection();
+	static XYSeriesCollection dataset = new XYSeriesCollection();
 	XYSeriesCollection dataset2 = new XYSeriesCollection();
 	XYSeriesCollection dataset3 = new XYSeriesCollection();
 	static TaskSeriesCollection data4 = new TaskSeriesCollection();
@@ -49,7 +49,7 @@ public class VisualGUI {
 	ChartPanel chartPanel3;
 	ChartPanel chartPanel4;
 	XYSeries[] seriesArray;
-	XYSeries overallSeries1 = new XYSeries("Overall");
+	static XYSeries overallSeries1 = new XYSeries("Overall");
 	XYSeries[] seriesArray2;
 	static XYSeries[] seriesArray3 = new XYSeries[3];
 	static ArrayList<TaskSeries> taskSeriesArray = new ArrayList<TaskSeries>();
@@ -76,7 +76,7 @@ public class VisualGUI {
 	public static ArrayList<VisualThread> threads = new ArrayList<VisualThread>();
 	
 	static ArrayList<StoredTask> storedTasks = new ArrayList<StoredTask>();
-
+	
 	protected VisualGUI(){
 
 		
@@ -84,8 +84,7 @@ public class VisualGUI {
 			public void run(){
 				
 				Analyzer.startActivityNotifications();
-
-//				seriesArray3 = new XYSeries[(int)getNumberOfThreads()];
+	
 				//This is for chart3 **************************************************
 				for(int i=0; i<seriesArray3.length; i++){
 					seriesArray3[i] = new XYSeries("Thread "+ Integer.toString((i+1)));
@@ -93,7 +92,6 @@ public class VisualGUI {
 				}
 				//********************************************************************
 				
-				//seriesArray3[0].add(300, 0D);
 				
 				System.out.printf("numThreads: %d\n", (int)getNumberOfThreads());												
 				
@@ -127,7 +125,7 @@ public class VisualGUI {
 					dataset2.addSeries(seriesArray2[i]);    						  //**
 				}																	  //**
 				//************************************************************************
-				
+				dataset.addSeries(overallSeries1);
 
 				chart2 = ChartFactory.createXYLineChart("Memory Usage", "Time", "Percentage", dataset2, PlotOrientation.VERTICAL, true, true, false);
 				plot2 = (XYPlot) chart2.getXYPlot();
@@ -327,6 +325,8 @@ public class VisualGUI {
 
 				jframe.setSize(900, 600);
 				jframe.setVisible(true);
+				
+				Analyzer.startDataCollection();
 
 
 				Thread thread = new Thread(new Runnable(){
@@ -420,6 +420,13 @@ public class VisualGUI {
 			i++;
 		}
 	}
+	
+	
+	public static void addSystemSlice(SystemSlice slice){
+		//System.out.println(slice.toString());
+		overallSeries1.add(slice.getTime() - programStartTime, slice.getCpu());
+	}
+	
 	
 	//This method takes in an ActivitySlice as a parameter and sends the data
 	//to the charts

@@ -84,6 +84,7 @@ public class Analyzer {
 	public static void addSystemSlice(SystemSlice ss)
 	{
 		systemList.add(ss);
+		VisualGUI.addSystemSlice(ss);
 	}
 	
 	public synchronized static void printAll()
