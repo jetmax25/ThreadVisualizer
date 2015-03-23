@@ -136,7 +136,7 @@ public class VisualGUI {
 				plot2.setBackgroundPaint(Color.BLACK);
 				
 				chart3 = ChartFactory.createScatterPlot("Thread Lifecycle", "Time", "Actions", dataset3);
-				String[] chart3AxisLabels = {"interrupted", "Joined", "Created", "Destroyed", "running"};
+				String[] chart3AxisLabels = {"Interrupted", "Joined", "Created", "Destroyed", "Started"};
 				SymbolAxis symbolaxis2 = new SymbolAxis("Series", chart3AxisLabels);
 				plot3 = chart3.getXYPlot();
 				plot3.setRangeAxis(symbolaxis2);
