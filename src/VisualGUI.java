@@ -36,7 +36,8 @@ import org.jfree.data.xy.XYSeriesCollection;
 
 public class VisualGUI {
 	static ConcurrentLinkedQueue<CriticalSectionQObject> criticalSectionQueue = new ConcurrentLinkedQueue<CriticalSectionQObject>();
-	
+	static ConcurrentLinkedQueue<ActivitySlice> activitySliceQueue = new ConcurrentLinkedQueue<ActivitySlice>();
+	static ConcurrentLinkedQueue<SystemSlice> systemSliceQueue = new ConcurrentLinkedQueue<SystemSlice>();
 	
 	static XYSeriesCollection dataset = new XYSeriesCollection();
 	static XYSeriesCollection dataset2 = new XYSeriesCollection();
@@ -376,7 +377,7 @@ public class VisualGUI {
 	//This method returns a random integer
 	public static int returnRandom(){
 		Random rn = new Random();
-		int answer = rn.nextInt(100) + 1;
+		int answer = rn.nextInt(40) + 1;
 		return answer;
 	}
 
