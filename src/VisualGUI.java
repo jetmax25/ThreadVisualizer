@@ -507,24 +507,6 @@ public class VisualGUI {
 		activitySliceQueue.add(slice);
 		
 		
-		//System.out.println("Activity Slice: " + slice.getDescription());
-//		if(slice.getDescription().equals("Initialized")){
-//			XYSeries series = seriesArraylist3.get(getTaskSeriesID(slice.getThread()));
-//			series.add(slice.getTime() - programStartTime, 2D);
-//		}
-//		else if(slice.getDescription().equals("start()")){
-//			XYSeries series = seriesArraylist3.get(getTaskSeriesID(slice.getThread()));
-//			series.add(slice.getTime() - programStartTime, 4D);
-//		}
-//		else if(slice.getDescription().equals("interrupt()")){
-//			XYSeries series = seriesArraylist3.get(getTaskSeriesID(slice.getThread()));
-//			series.add(slice.getTime() - programStartTime, 0D);
-//		}
-//		else if(slice.getDescription().equals("destroy()")){
-//			XYSeries series = seriesArraylist3.get(getTaskSeriesID(slice.getThread()));
-//			series.add(slice.getTime() - programStartTime, 3D);
-//		}
-		
 	}
 		
 	
