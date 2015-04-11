@@ -8,6 +8,7 @@ import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Random;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
@@ -34,49 +35,60 @@ import org.jfree.data.xy.XYSeriesCollection;
 
 
 public class VisualGUI {
+	static ConcurrentLinkedQueue<CriticalSectionQObject> criticalSectionQueue = new ConcurrentLinkedQueue<CriticalSectionQObject>();
+	
+	
 	static XYSeriesCollection dataset = new XYSeriesCollection();
-	XYSeriesCollection dataset2 = new XYSeriesCollection();
-	XYSeriesCollection dataset3 = new XYSeriesCollection();
+	static XYSeriesCollection dataset2 = new XYSeriesCollection();
+	static XYSeriesCollection dataset3 = new XYSeriesCollection();
 	static TaskSeriesCollection data4 = new TaskSeriesCollection();
 	XYTaskDataset dataset4;
 	JFreeChart chart; //CPU usage chart
 	JFreeChart chart2; //Memory usage chart
 	JFreeChart chart3;
 	JFreeChart chart4; //Critical Section chart
-	JFreeChart currChart; //currChart keeps track of the chart currently being displayed to the user
+	static JFreeChart currChart; //currChart keeps track of the chart currently being displayed to the user
 	ChartPanel chartPanel;
 	ChartPanel chartPanel2;
 	ChartPanel chartPanel3;
 	ChartPanel chartPanel4;
-	XYSeries[] seriesArray;
-	static XYSeries overallSeries1 = new XYSeries("Overall");
-	XYSeries[] seriesArray2;
-	static XYSeries[] seriesArray3 = new XYSeries[3];
+	//XYSeries[] seriesArray;
+	static ArrayList<XYSeries> seriesArraylist = new ArrayList<XYSeries>();
+	//static XYSeries overallSeries1 = new XYSeries("Overall");
+	//XYSeries[] seriesArray2;
+	static ArrayList<XYSeries> seriesArraylist2 = new ArrayList<XYSeries>();
+	static ArrayList<XYSeries> seriesArraylist3 = new ArrayList<XYSeries>();
 	static ArrayList<TaskSeries> taskSeriesArray = new ArrayList<TaskSeries>();
-	JCheckBox[] checkboxes; //array that hold all of the checkboxes
+	//static JCheckBox[] checkboxes; //array that hold all of the checkboxes
+	
+	static ArrayList<JCheckBox> checkboxes = new ArrayList<JCheckBox>();
+	
 	JFrame jframe;
 	GridBagConstraints gc;
 	JPanel jpanel1;
 	JPanel jpanel2;
-	JPanel jpanel3;
+	static JPanel jpanel3 = new JPanel();
 
 	XYPlot plot1;
 	XYPlot plot2;
 	XYPlot plot3;
 	static XYPlot plot4;
+	
+	static ArrayList<String> chart4AxisLabels = new ArrayList<String>();
+	
 	NumberAxis domain1;
 	NumberAxis domain2;
 	NumberAxis domain3;
 	NumberAxis domain4;
+	
+	static Task curTask;
 
-	XYBarRenderer renderer4;
+	static XYBarRenderer renderer4;
 	
 	static long programStartTime = System.currentTimeMillis();
 	
 	public static ArrayList<VisualThread> threads = new ArrayList<VisualThread>();
-	
-	static ArrayList<StoredTask> storedTasks = new ArrayList<StoredTask>();
-	
+		
 	protected VisualGUI(){
 
 		
@@ -85,13 +97,6 @@ public class VisualGUI {
 				
 				Analyzer.startActivityNotifications();
 	
-				//This is for chart3 **************************************************
-				for(int i=0; i<seriesArray3.length; i++){
-					seriesArray3[i] = new XYSeries("Thread "+ Integer.toString((i+1)));
-					dataset3.addSeries(seriesArray3[i]);
-				}
-				//********************************************************************
-				
 				
 				System.out.printf("numThreads: %d\n", (int)getNumberOfThreads());												
 				
@@ -115,17 +120,17 @@ public class VisualGUI {
 				domain1.setRange(0,10);
 				plot1.setBackgroundPaint(Color.BLACK);
 
-				//This is for chart1 and chart2 ******************************************
-				seriesArray = new XYSeries[(int)getNumberOfThreads()];				  //**
-				seriesArray2 = new XYSeries[(int) getNumberOfThreads()];			  //**
-				for(int i = 0; i<seriesArray.length; i++){                            //**
-					seriesArray[i] = new XYSeries("Thread" + Integer.toString(i+1));  //**
-					seriesArray2[i] = new XYSeries("Thread" + Integer.toString(2*i)); //**
-					dataset.addSeries(seriesArray[i]);								  //**
-					dataset2.addSeries(seriesArray2[i]);    						  //**
-				}																	  //**
-				//************************************************************************
-				dataset.addSeries(overallSeries1);
+//				//This is for chart1 and chart2 ******************************************
+//				seriesArray = new XYSeries[(int)getNumberOfThreads()];				  //**
+//				seriesArray2 = new XYSeries[(int) getNumberOfThreads()];			  //**
+//				for(int i = 0; i<seriesArray.length; i++){                            //**
+//					seriesArray[i] = new XYSeries("Thread" + Integer.toString(i+1));  //**
+//					seriesArray2[i] = new XYSeries("Thread" + Integer.toString(2*i)); //**
+//					dataset.addSeries(seriesArray[i]);								  //**
+//					dataset2.addSeries(seriesArray2[i]);    						  //**
+//				}																	  //**
+//				//************************************************************************
+				//dataset.addSeries(overallSeries1);
 
 				chart2 = ChartFactory.createXYLineChart("Memory Usage", "Time", "Percentage", dataset2, PlotOrientation.VERTICAL, true, true, false);
 				plot2 = (XYPlot) chart2.getXYPlot();
@@ -143,24 +148,18 @@ public class VisualGUI {
 				
 				chart4 = ChartFactory.createXYBarChart("Critical Sections", "Thread", false, "Time", dataset4, PlotOrientation.HORIZONTAL, true, true, false);
 				
-				//create labels for the critical sections chart y-axis
-				String[] chart4AxisLabels = new String[(int)getNumberOfThreads()];
-				for(int j=0; j<chart4AxisLabels.length; j++){
-					chart4AxisLabels[j] = "Thread " + (j+1);
-				}
-				SymbolAxis symbolaxis = new SymbolAxis("Series", chart4AxisLabels);
-
 				//set the domain and range of the critical sections axes
 				plot4 = chart4.getXYPlot();
-				plot4.setDomainAxis(symbolaxis);
 				plot4.setRangeAxis(new NumberAxis("Time (Milliseconds)"));
+				plot4.setRenderer(new CriticalSectionsBarRenderer());
+			
 
 				//not entirely sure why we need these three lines but its started working when I put them in
 				renderer4 = (XYBarRenderer) plot4.getRenderer();
 				renderer4.setUseYInterval(true);
 				ChartUtilities.applyCurrentTheme(chart4);
 				
-				//addStoredTasks();
+				
 											
 				//creating JButtons for JPanel 1
 				JButton button1 = new JButton("CPU Visualizer");
@@ -233,7 +232,7 @@ public class VisualGUI {
 				jpanel1.setLayout(new BoxLayout(jpanel1, BoxLayout.Y_AXIS));
 
 				jpanel2 = new JPanel();
-				jpanel3 = new JPanel();			
+				//jpanel3 = new JPanel();			
 
 				//adding buttons to JPanel1
 				jpanel1.add(button1);
@@ -248,41 +247,28 @@ public class VisualGUI {
 				jpanel2.add(chartPanel);
 				jpanel2.setVisible(true);
 
-				//adding checkboxes to jpanel3
-				int numThreads = (int) getNumberOfThreads();
-				checkboxes = new JCheckBox[numThreads];
-
-				int i;
-				for(i=0; i<numThreads; i++){
-					checkboxes[i] = new JCheckBox("Thread " + Integer.toString(i+1), true);
-					checkboxes[i].addActionListener(new ActionListener(){
-						public void actionPerformed(ActionEvent e){
-							//remove data series here
-							JCheckBox thisBox = (JCheckBox) e.getSource();
-							if(thisBox.isSelected() == false){
-								removeSeries(thisBox.getText());
-							}
-							else{
-								addSeries(thisBox.getText());
-							}
-						}
-					});
-					jpanel3.add(checkboxes[i]);
-				}
+//				//adding checkboxes to jpanel3
+//				int numThreads = (int) getNumberOfThreads();
+//				checkboxes = new JCheckBox[numThreads];
+//
+//				int i;
+//				for(i=0; i<numThreads; i++){
+//					checkboxes[i] = new JCheckBox("Thread " + Integer.toString(i+1), true);
+//					checkboxes[i].addActionListener(new ActionListener(){
+//						public void actionPerformed(ActionEvent e){
+//							//remove data series here
+//							JCheckBox thisBox = (JCheckBox) e.getSource();
+//							if(thisBox.isSelected() == false){
+//								setSeriesInvisible(thisBox.getText());
+//							}
+//							else{
+//								setSeriesVisible(thisBox.getText());
+//							}
+//						}
+//					});
+//					jpanel3.add(checkboxes[i]);
+//				}
 				
-//				JCheckBox overallCheckBox = new JCheckBox("Overall", true);
-//				overallCheckBox.addActionListener(new ActionListener(){
-//					public void actionPerformed(ActionEvent e){
-//						JCheckBox thisBox = (JCheckBox) e.getSource();
-//						if(thisBox.isSelected() == false){
-//							//removeSeries
-//						}
-//						else{
-//							//addSeries
-//						}
-//					}
-//				});
-//				jpanel3.add(overallCheckBox);
 				
 				jpanel3.setVisible(true);
 
@@ -326,7 +312,21 @@ public class VisualGUI {
 				jframe.setSize(900, 600);
 				jframe.setVisible(true);
 				
+				
 				Analyzer.startDataCollection();
+				
+				Thread dequeuerThread = new Thread(new Runnable(){
+					public void run(){
+						while(true){
+							while(criticalSectionQueue.isEmpty() == true){}
+							for(int i=0; i<criticalSectionQueue.size(); i++){
+								CriticalSectionQObject qObject = criticalSectionQueue.poll();
+								taskSeriesArray.get(qObject.index).add(qObject.task);
+							}
+						}
+					}
+				});
+				dequeuerThread.start();
 
 
 				Thread thread = new Thread(new Runnable(){
@@ -334,7 +334,7 @@ public class VisualGUI {
 						int counter = 0;
 						int i;
 						while(true){
-							for(i=0; i<seriesArray.length; i++){
+							for(i=0; i<seriesArraylist.size(); i++){
 								addCpuUsage(counter, i);
 								addMemoryUsage(counter, i);
 								if(counter > 10){
@@ -350,7 +350,7 @@ public class VisualGUI {
 						}
 					}
 				});
-				thread.run();
+				thread.start();
 
 
 			}
@@ -361,12 +361,16 @@ public class VisualGUI {
 
 
 	public void addCpuUsage(int counter, int index){
-		seriesArray[index].add(counter, returnRandom());
+		//seriesArray[index].add(counter, returnRandom());
+		XYSeries series = seriesArraylist.get(index);
+		series.add(counter, returnRandom());
 		
 	}
 	
 	public void addMemoryUsage(int counter, int index){
-		seriesArray2[index].add(counter, (returnRandom()*2)%100);
+		//seriesArray2[index].add(counter, (returnRandom()*2)%100);
+		XYSeries series = seriesArraylist2.get(index);
+		series.add(counter, (returnRandom()*2)%100);
 	}
 	
 	//This method returns a random integer
@@ -382,10 +386,46 @@ public class VisualGUI {
 		return Analyzer.threadCount();
 		//return 3;
 	}
+	
+	private static void createCheckbox(int threadNumber){
+		JCheckBox newCheckBox = new JCheckBox("Thread " + threadNumber, true);
+		
+		
+		newCheckBox.addActionListener(new ActionListener(){
+			public void actionPerformed(ActionEvent e){
+				//remove data series here
+				JCheckBox thisBox = (JCheckBox) e.getSource();
+				if(thisBox.isSelected() == false){
+					setSeriesInvisible(thisBox.getText());
+				}
+				else{
+					setSeriesVisible(thisBox.getText());
+				}
+			}
+		});
+		
+		newCheckBox.setVisible(true);
+		jpanel3.add(newCheckBox);
+		jpanel3.revalidate();
+		jpanel3.repaint();
+	}
+	
+	
+	private static void createChart4AxisLabels(int threadNumber){
+		chart4AxisLabels.add("Thread" + threadNumber);
+		String[] axisLabels = new String[chart4AxisLabels.size()];
+		for(int i=0; i<axisLabels.length; i++){
+			axisLabels[i] = chart4AxisLabels.get(i);
+		}
+		
+		SymbolAxis symbolAxis = new SymbolAxis("Series", axisLabels);
+		try{plot4.setDomainAxis(symbolAxis);}
+		catch(NullPointerException e){}
+	}
 
 
 	//This method make a certain line on the line chart invisible 
-	private void removeSeries(String string){		
+	private static void setSeriesInvisible(String string){		
 		if(string == null)
 			return;
 
@@ -404,7 +444,7 @@ public class VisualGUI {
 
 
 	//This method makes a previously invisible line on the line chart visible again
-	private void addSeries(String string){		
+	private static void setSeriesVisible(String string){		
 		if(string == null)
 			return;
 
@@ -424,7 +464,7 @@ public class VisualGUI {
 	
 	public static void addSystemSlice(SystemSlice slice){
 		//System.out.println(slice.toString());
-		overallSeries1.add(slice.getTime() - programStartTime, slice.getCpu());
+		//overallSeries1.add(slice.getTime() - programStartTime, slice.getCpu());
 	}
 	
 	
@@ -433,44 +473,42 @@ public class VisualGUI {
 	public static void addActivitySlice(ActivitySlice slice){
 		//System.out.println("Activity Slice: " + slice.getDescription());
 		if(slice.getDescription().equals("Initialized")){
-			seriesArray3[getTaskSeriesID(slice.getThread())].add(slice.getTime() - programStartTime, 2D);
+			XYSeries series = seriesArraylist3.get(getTaskSeriesID(slice.getThread()));
+			series.add(slice.getTime() - programStartTime, 2D);
 		}
 		else if(slice.getDescription().equals("start()")){
-			seriesArray3[getTaskSeriesID(slice.getThread())].add(slice.getTime() - programStartTime, 4D);
+			XYSeries series = seriesArraylist3.get(getTaskSeriesID(slice.getThread()));
+			series.add(slice.getTime() - programStartTime, 4D);
 		}
 		else if(slice.getDescription().equals("interrupt()")){
-			seriesArray3[getTaskSeriesID(slice.getThread())].add(slice.getTime() - programStartTime, 0D);
+			XYSeries series = seriesArraylist3.get(getTaskSeriesID(slice.getThread()));
+			series.add(slice.getTime() - programStartTime, 0D);
 		}
 		else if(slice.getDescription().equals("destroy()")){
-			seriesArray3[getTaskSeriesID(slice.getThread())].add(slice.getTime() - programStartTime, 3D);
+			XYSeries series = seriesArraylist3.get(getTaskSeriesID(slice.getThread()));
+			series.add(slice.getTime() - programStartTime, 3D);
 		}
 		
 	}
-	//seriesArray3[0].add(300, 0D);
+		
+	
 	
 	//This method adds a critical section to the critical section bar chart and should be called by
 	//the Visualizer class when the Visualizer.leaveCriticalSection() method is used
 	public static void addCriticalSection(String criticalSection, long id, long enter, long leave){
-		//System.out.println("Critical Section Added");
-		Date enterTime = new Date(enter-programStartTime);
-		Date exitTime = new Date(leave-programStartTime);
-		Task thisTask = new Task(criticalSection, enterTime, exitTime);
+		long start = enter - programStartTime;
+		long end = leave - programStartTime;
+		Date enterTime = new Date(start);
+		Date exitTime = new Date(end);
+		
+		curTask = new Task(criticalSection, enterTime, exitTime);
 		int index = getTaskSeriesID(id);
-		//System.out.println(id + " " + enter + " " + leave);
-		try{taskSeriesArray.get(index).add(new Task(criticalSection, enterTime, exitTime));}
-		catch(NullPointerException n){
-			storedTasks.add(new StoredTask(thisTask, index));
-		}		
+		
+		CriticalSectionQObject qObject = new CriticalSectionQObject(curTask, index);
+		criticalSectionQueue.add(qObject);		
 	}
 	
 	
-	public static void addStoredTasks(){
-		for(int i=0; i<storedTasks.size(); i++){
-			StoredTask thisStoredTask = storedTasks.get(i);
-			Task newTask = thisStoredTask.task;
-			taskSeriesArray.get(thisStoredTask.index).add(newTask);
-		}
-	}
 	
 	//returns -1 if thread with given id does not exist
 	public static int getTaskSeriesID(long id){
@@ -497,7 +535,20 @@ public class VisualGUI {
 	//This method will be called by the library when the number of threads changes
 	public static void threadAdded(VisualThread newThread){
 		threads.add(newThread);
+		int threadNum = threads.size();
+		XYSeries series = new XYSeries("Thread" + Integer.toString(threadNum));
+		seriesArraylist.add(series);
+		XYSeries series2 = new XYSeries("Thread" + Integer.toString(threadNum));
+		seriesArraylist2.add(series2);
+		dataset.addSeries(series);
+		dataset2.addSeries(series2);
+		
+		createCheckbox(threadNum);
+		createChart4AxisLabels(threadNum);
 		TaskSeries task = new TaskSeries("Thread "+ Long.toString(getTaskSeriesID(newThread.getId())+1));
+		XYSeries series3 = new XYSeries("Thread" + threadNum);
+		seriesArraylist3.add(series3);
+		dataset3.addSeries(series3);
 		taskSeriesArray.add(task);
 		data4.add(task);
 	}
