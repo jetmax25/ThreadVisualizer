@@ -316,7 +316,7 @@ public class VisualGUI {
 				
 				Analyzer.startDataCollection();
 				
-				Thread dequeuerThread = new Thread(new Runnable(){
+				Thread CsDequeuerThread = new Thread(new Runnable(){
 					public void run(){
 						while(true){
 							while(criticalSectionQueue.isEmpty() == true){}
@@ -327,8 +327,38 @@ public class VisualGUI {
 						}
 					}
 				});
-				dequeuerThread.start();
-
+				CsDequeuerThread.start();
+				
+				
+				Thread AsDequeuerThread = new Thread(new Runnable(){
+					public void run(){
+						while(true){
+							while(activitySliceQueue.isEmpty() == true){}
+							for(int i=0; i<activitySliceQueue.size(); i++){
+								ActivitySlice slice = activitySliceQueue.poll();
+								if(slice.getDescription().equals("Initialized")){
+									XYSeries series = seriesArraylist3.get(getTaskSeriesID(slice.getThread()));
+									series.add(slice.getTime() - programStartTime, 2D);
+								}
+								else if(slice.getDescription().equals("start()")){
+									XYSeries series = seriesArraylist3.get(getTaskSeriesID(slice.getThread()));
+									series.add(slice.getTime() - programStartTime, 4D);
+								}
+								else if(slice.getDescription().equals("interrupt()")){
+									XYSeries series = seriesArraylist3.get(getTaskSeriesID(slice.getThread()));
+									series.add(slice.getTime() - programStartTime, 0D);
+								}
+								else if(slice.getDescription().equals("destroy()")){
+									XYSeries series = seriesArraylist3.get(getTaskSeriesID(slice.getThread()));
+									series.add(slice.getTime() - programStartTime, 3D);
+								}
+							}
+						}
+					}
+				});
+				AsDequeuerThread.start();
+				
+				
 
 				Thread thread = new Thread(new Runnable(){
 					public void run(){
@@ -472,23 +502,28 @@ public class VisualGUI {
 	//This method takes in an ActivitySlice as a parameter and sends the data
 	//to the charts
 	public static void addActivitySlice(ActivitySlice slice){
+		
+		
+		activitySliceQueue.add(slice);
+		
+		
 		//System.out.println("Activity Slice: " + slice.getDescription());
-		if(slice.getDescription().equals("Initialized")){
-			XYSeries series = seriesArraylist3.get(getTaskSeriesID(slice.getThread()));
-			series.add(slice.getTime() - programStartTime, 2D);
-		}
-		else if(slice.getDescription().equals("start()")){
-			XYSeries series = seriesArraylist3.get(getTaskSeriesID(slice.getThread()));
-			series.add(slice.getTime() - programStartTime, 4D);
-		}
-		else if(slice.getDescription().equals("interrupt()")){
-			XYSeries series = seriesArraylist3.get(getTaskSeriesID(slice.getThread()));
-			series.add(slice.getTime() - programStartTime, 0D);
-		}
-		else if(slice.getDescription().equals("destroy()")){
-			XYSeries series = seriesArraylist3.get(getTaskSeriesID(slice.getThread()));
-			series.add(slice.getTime() - programStartTime, 3D);
-		}
+//		if(slice.getDescription().equals("Initialized")){
+//			XYSeries series = seriesArraylist3.get(getTaskSeriesID(slice.getThread()));
+//			series.add(slice.getTime() - programStartTime, 2D);
+//		}
+//		else if(slice.getDescription().equals("start()")){
+//			XYSeries series = seriesArraylist3.get(getTaskSeriesID(slice.getThread()));
+//			series.add(slice.getTime() - programStartTime, 4D);
+//		}
+//		else if(slice.getDescription().equals("interrupt()")){
+//			XYSeries series = seriesArraylist3.get(getTaskSeriesID(slice.getThread()));
+//			series.add(slice.getTime() - programStartTime, 0D);
+//		}
+//		else if(slice.getDescription().equals("destroy()")){
+//			XYSeries series = seriesArraylist3.get(getTaskSeriesID(slice.getThread()));
+//			series.add(slice.getTime() - programStartTime, 3D);
+//		}
 		
 	}
 		
