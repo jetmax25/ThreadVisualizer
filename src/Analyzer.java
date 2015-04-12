@@ -7,7 +7,7 @@ import java.util.concurrent.TimeUnit;
 
 public class Analyzer {
 
-	private static VisualGUI gui = new VisualGUI();	
+	//private static VisualGUI gui = new VisualGUI();	
 	
 	private static Hashtable<Long,Thread> threadTable = new Hashtable<Long, Thread>();
 	private  static Hashtable<Long,ArrayList<ActivitySlice>> activityTable = new Hashtable<Long, ArrayList<ActivitySlice>>();

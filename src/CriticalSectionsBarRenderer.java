@@ -3,7 +3,9 @@ import java.awt.Paint;
 import java.util.Random;
 
 import org.jfree.chart.renderer.xy.XYBarRenderer;
-import org.jfree.data.gantt.XYTaskDataset;
+import org.jfree.data.gantt.Task;
+import org.jfree.data.gantt.TaskSeries;
+
 
 
 public class CriticalSectionsBarRenderer extends XYBarRenderer {
@@ -15,11 +17,21 @@ public class CriticalSectionsBarRenderer extends XYBarRenderer {
 	
 	public Paint getItemPaint(int row, int col){
 				
-		Paint paint = super.getItemPaint(row, col);
+		//Paint paint = super.getItemPaint(row, col);
 		
-		//This is where we deque the wait free queue
+		TaskSeries series = VisualGUI.taskSeriesArray.get(row);
+		Task task = series.get(col);
 		
-		return paint;
+		
+		
+		if(task.getDescription().equals("alpha"))
+			return Color.RED;
+		
+		else if(task.getDescription().equals("beta"))
+			return Color.BLUE;
+					
+		return Color.GREEN;
+		//return paint;
 	}
 	
 	

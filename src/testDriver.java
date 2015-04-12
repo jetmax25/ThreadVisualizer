@@ -4,7 +4,7 @@ import java.util.concurrent.locks.ReentrantLock;
 
 
 public class testDriver {
-
+	
 
 	static Lock lock = new ReentrantLock();
 	static Lock lock2 = new ReentrantLock();
@@ -23,11 +23,11 @@ public class testDriver {
 				while(i<5){
 					try{Thread.sleep(VisualGUI.returnRandom()*10);}
 					catch(InterruptedException e){}
-					//int rand = returnRandom();
-					//if(rand == 1)
+					int rand = returnRandom();
+					if(rand == 1)
 						criticalMethod(x);
-					//else 
-					//	criticalMethod2(x);
+					else 
+						criticalMethod2(x);
 					i++;
 				}
 			}
@@ -46,11 +46,11 @@ public class testDriver {
 				while(i<5){
 					try{Thread.sleep(VisualGUI.returnRandom()*10);}
 					catch(InterruptedException e){}
-				//	int rand = returnRandom();
-					//if(rand == 1)
-					//	criticalMethod(y);
-					//else
+					int rand = returnRandom();
+					if(rand == 1)
 						criticalMethod(y);
+					else
+						criticalMethod2(y);
 					i++;
 				}
 			}
@@ -70,11 +70,11 @@ public class testDriver {
 				while(i<5){
 					try{Thread.sleep(VisualGUI.returnRandom()*10);}
 					catch(InterruptedException e){}
-					//int rand = returnRandom();
-					//if(rand == 1)
+					int rand = returnRandom();
+					if(rand == 1)
 						criticalMethod(z);
-					//else
-					//	criticalMethod2(z);
+					else
+						criticalMethod2(z);
 					
 					i++;
 				}
@@ -84,8 +84,8 @@ public class testDriver {
 		catch(InterruptedException e){}
 		z.start();
 		
-		try{Thread.sleep(4000);}
-		catch(InterruptedException e){}
+//		try{Thread.sleep(4000);}
+//		catch(InterruptedException e){}
 		
 		u = new VisualThread(){
 			@Override
@@ -94,11 +94,11 @@ public class testDriver {
 				while(i<5){
 					try{Thread.sleep(VisualGUI.returnRandom()*10);}
 					catch(InterruptedException e){}
-					//int rand = returnRandom();
-					//if(rand == 1)
+					int rand = returnRandom();
+					if(rand == 1)
 						criticalMethod(u);
-					//else
-					//	criticalMethod2(u);
+					else
+						criticalMethod2(u);
 					
 					i++;
 				}
@@ -146,14 +146,14 @@ public class testDriver {
 		lock.unlock();
 	}
 	
-//	public static void criticalMethod2(VisualThread vs){
-//		lock2.lock();
-//		vs.enterCriticalSection("beta");
-//		try{Thread.sleep(500);}
-//		catch(InterruptedException e){}
-//		vs.leaveCriticalSection("beta");
-//		lock2.unlock();
-//	}
+	public static void criticalMethod2(VisualThread vs){
+		lock2.lock();
+		vs.enterCriticalSection("beta");
+		try{Thread.sleep(500);}
+		catch(InterruptedException e){}
+		vs.leaveCriticalSection("beta");
+		lock2.unlock();
+	}
 	
 	private static synchronized int returnRandom(){
 		Random rn = new Random();

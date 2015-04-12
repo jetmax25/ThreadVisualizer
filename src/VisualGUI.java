@@ -8,6 +8,7 @@ import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Random;
+import java.util.Set;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import javax.swing.BoxLayout;
@@ -35,6 +36,8 @@ import org.jfree.data.xy.XYSeriesCollection;
 
 
 public class VisualGUI {
+	static int threadCount=0;
+	
 	static ConcurrentLinkedQueue<CriticalSectionQObject> criticalSectionQueue = new ConcurrentLinkedQueue<CriticalSectionQObject>();
 	static ConcurrentLinkedQueue<ActivitySlice> activitySliceQueue = new ConcurrentLinkedQueue<ActivitySlice>();
 	static ConcurrentLinkedQueue<SystemSlice> systemSliceQueue = new ConcurrentLinkedQueue<SystemSlice>();
@@ -47,7 +50,7 @@ public class VisualGUI {
 	JFreeChart chart; //CPU usage chart
 	JFreeChart chart2; //Memory usage chart
 	JFreeChart chart3;
-	JFreeChart chart4; //Critical Section chart
+	static JFreeChart chart4; //Critical Section chart
 	static JFreeChart currChart; //currChart keeps track of the chart currently being displayed to the user
 	ChartPanel chartPanel;
 	ChartPanel chartPanel2;
@@ -76,6 +79,7 @@ public class VisualGUI {
 	static XYPlot plot4;
 	
 	static ArrayList<String> chart4AxisLabels = new ArrayList<String>();
+	static ArrayList<String> criticalSectionStrings = new ArrayList<String>();
 	
 	NumberAxis domain1;
 	NumberAxis domain2;
@@ -84,6 +88,7 @@ public class VisualGUI {
 	
 	static Task curTask;
 
+
 	static XYBarRenderer renderer4;
 	
 	static long programStartTime = System.currentTimeMillis();
@@ -91,7 +96,8 @@ public class VisualGUI {
 	public static ArrayList<VisualThread> threads = new ArrayList<VisualThread>();
 		
 	protected VisualGUI(){
-
+		dataset4 = new XYTaskDataset(data4);
+		chart4 = ChartFactory.createXYBarChart("Critical Sections", "Thread", false, "Time", dataset4, PlotOrientation.HORIZONTAL, true, true, false);
 		
 		Thread guiThread = new Thread(new Runnable(){
 			public void run(){
@@ -107,7 +113,7 @@ public class VisualGUI {
 				//dataset2 = new XYSeriesCollection();
 
 				//data4 = new TaskSeriesCollection();
-				dataset4 = new XYTaskDataset(data4);
+				//dataset4 = new XYTaskDataset(data4);
 				
 
 				// create charts
@@ -147,13 +153,14 @@ public class VisualGUI {
 				plot3.setDomainAxis(new NumberAxis("Time (Milliseconds)"));
 
 				
-				chart4 = ChartFactory.createXYBarChart("Critical Sections", "Thread", false, "Time", dataset4, PlotOrientation.HORIZONTAL, true, true, false);
+			
 				
 				//set the domain and range of the critical sections axes
 				plot4 = chart4.getXYPlot();
 				plot4.setRangeAxis(new NumberAxis("Time (Milliseconds)"));
 				plot4.setRenderer(new CriticalSectionsBarRenderer());
 			
+				//SymbolAxis symbolAxis = new SymbolAxis("Series", )
 
 				//not entirely sure why we need these three lines but its started working when I put them in
 				renderer4 = (XYBarRenderer) plot4.getRenderer();
@@ -322,6 +329,9 @@ public class VisualGUI {
 							while(criticalSectionQueue.isEmpty() == true){}
 							for(int i=0; i<criticalSectionQueue.size(); i++){
 								CriticalSectionQObject qObject = criticalSectionQueue.poll();
+								if(!criticalSectionStrings.contains(qObject.task.getDescription()))
+									criticalSectionStrings.add(qObject.task.getDescription());
+									
 								taskSeriesArray.get(qObject.index).add(qObject.task);
 							}
 						}
@@ -390,7 +400,6 @@ public class VisualGUI {
 		guiThread.start();
 	}
 
-
 	public void addCpuUsage(int counter, int index){
 		//seriesArray[index].add(counter, returnRandom());
 		XYSeries series = seriesArraylist.get(index);
@@ -451,7 +460,7 @@ public class VisualGUI {
 		
 		SymbolAxis symbolAxis = new SymbolAxis("Series", axisLabels);
 		try{plot4.setDomainAxis(symbolAxis);}
-		catch(NullPointerException e){}
+		catch(NullPointerException e){/*System.out.println("plot4 not initialized");*/}
 	}
 
 
@@ -551,7 +560,13 @@ public class VisualGUI {
 	}
 
 	//This method will be called by the library when the number of threads changes
-	public static void threadAdded(VisualThread newThread){
+	public static void threadAdded(final VisualThread newThread){
+		if(threadCount == 0){
+			new VisualGUI();
+			plot4 = chart4.getXYPlot();
+			threadCount++;
+		}
+		
 		threads.add(newThread);
 		int threadNum = threads.size();
 		XYSeries series = new XYSeries("Thread" + Integer.toString(threadNum));
@@ -563,12 +578,15 @@ public class VisualGUI {
 		
 		createCheckbox(threadNum);
 		createChart4AxisLabels(threadNum);
+
 		TaskSeries task = new TaskSeries("Thread "+ Long.toString(getTaskSeriesID(newThread.getId())+1));
 		XYSeries series3 = new XYSeries("Thread" + threadNum);
 		seriesArraylist3.add(series3);
 		dataset3.addSeries(series3);
 		taskSeriesArray.add(task);
 		data4.add(task);
+		
+		
 	}
 
 }
