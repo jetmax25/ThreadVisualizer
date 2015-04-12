@@ -7,7 +7,7 @@ import java.util.concurrent.TimeUnit;
 
 public class Analyzer {
 
-	private static VisualGUI gui = new VisualGUI();	
+	//private static VisualGUI gui = new VisualGUI();	
 	
 	private static Hashtable<Long,Thread> threadTable = new Hashtable<Long, Thread>();
 	private  static Hashtable<Long,ArrayList<ActivitySlice>> activityTable = new Hashtable<Long, ArrayList<ActivitySlice>>();
@@ -44,6 +44,7 @@ public class Analyzer {
 	//Threads will call this method to add themselves to the ArrayList
 	public static void addThread(Thread th)
 	{
+		
 		threadTable.put(th.getId(), th);
 		activityTable.put(th.getId(), new ArrayList<ActivitySlice>());
 		activeThreads++;
@@ -84,6 +85,7 @@ public class Analyzer {
 	public static void addSystemSlice(SystemSlice ss)
 	{
 		systemList.add(ss);
+		VisualGUI.addSystemSlice(ss);
 	}
 	
 	public synchronized static void printAll()
@@ -184,7 +186,7 @@ public class Analyzer {
 	
 	public static void enteringCriticalSection(long id, String section, long time)
 	{
-		//new critical sectiomn
+		//new critical section
 		if(!criticalSection.containsKey(section)){
 			criticalSection.put(section, new Hashtable<Long, long[]>());
 			//VisualGUI.addCriticalSection(section);
