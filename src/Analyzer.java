@@ -44,6 +44,7 @@ public class Analyzer {
 	//Threads will call this method to add themselves to the ArrayList
 	public static void addThread(Thread th)
 	{
+		
 		threadTable.put(th.getId(), th);
 		activityTable.put(th.getId(), new ArrayList<ActivitySlice>());
 		activeThreads++;
