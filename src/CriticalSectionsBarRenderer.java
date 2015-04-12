@@ -10,6 +10,10 @@ import org.jfree.data.gantt.TaskSeries;
 
 public class CriticalSectionsBarRenderer extends XYBarRenderer {
 	
+	//Allows for 10 critical sections
+	Color[] colors = {Color.BLUE, Color.CYAN, Color.GREEN, Color.MAGENTA, Color.ORANGE, Color.PINK,
+						Color.RED, Color.WHITE, Color.YELLOW, Color.BLACK};
+	
 	public CriticalSectionsBarRenderer(){
 		super();
 	}
@@ -22,13 +26,11 @@ public class CriticalSectionsBarRenderer extends XYBarRenderer {
 		TaskSeries series = VisualGUI.taskSeriesArray.get(row);
 		Task task = series.get(col);
 		
+		for(int i=0; i<10; i++){
+			if(task.getDescription().equals(VisualGUI.criticalSectionStrings.get(i)))
+				return colors[i];
+		}
 		
-		
-		if(task.getDescription().equals("alpha"))
-			return Color.RED;
-		
-		else if(task.getDescription().equals("beta"))
-			return Color.BLUE;
 					
 		return Color.GREEN;
 		//return paint;

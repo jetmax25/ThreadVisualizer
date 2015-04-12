@@ -4,8 +4,6 @@ import java.util.concurrent.locks.ReentrantLock;
 
 
 public class testDriver {
-	
-
 	static Lock lock = new ReentrantLock();
 	static Lock lock2 = new ReentrantLock();
 	static VisualThread x;
@@ -14,7 +12,7 @@ public class testDriver {
 	static VisualThread u;
 	
 	public static void main(String[] args) throws InterruptedException {
-				
+		
 		// TODO Auto-generated method stub
 		x = new VisualThread(){
 			@Override

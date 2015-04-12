@@ -185,7 +185,7 @@ public class Analyzer {
 	
 	public static void enteringCriticalSection(long id, String section, long time)
 	{
-		//new critical sectiomn
+		//new critical section
 		if(!criticalSection.containsKey(section)){
 			criticalSection.put(section, new Hashtable<Long, long[]>());
 			//VisualGUI.addCriticalSection(section);

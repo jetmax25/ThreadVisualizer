@@ -8,13 +8,13 @@ import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Random;
-import java.util.Set;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
 import org.jfree.chart.ChartFactory;
@@ -88,7 +88,6 @@ public class VisualGUI {
 	
 	static Task curTask;
 
-
 	static XYBarRenderer renderer4;
 	
 	static long programStartTime = System.currentTimeMillis();
@@ -127,17 +126,7 @@ public class VisualGUI {
 				domain1.setRange(0,10);
 				plot1.setBackgroundPaint(Color.BLACK);
 
-//				//This is for chart1 and chart2 ******************************************
-//				seriesArray = new XYSeries[(int)getNumberOfThreads()];				  //**
-//				seriesArray2 = new XYSeries[(int) getNumberOfThreads()];			  //**
-//				for(int i = 0; i<seriesArray.length; i++){                            //**
-//					seriesArray[i] = new XYSeries("Thread" + Integer.toString(i+1));  //**
-//					seriesArray2[i] = new XYSeries("Thread" + Integer.toString(2*i)); //**
-//					dataset.addSeries(seriesArray[i]);								  //**
-//					dataset2.addSeries(seriesArray2[i]);    						  //**
-//				}																	  //**
-//				//************************************************************************
-				//dataset.addSeries(overallSeries1);
+
 
 				chart2 = ChartFactory.createXYLineChart("Memory Usage", "Time", "Percentage", dataset2, PlotOrientation.VERTICAL, true, true, false);
 				plot2 = (XYPlot) chart2.getXYPlot();
@@ -254,28 +243,6 @@ public class VisualGUI {
 				//adding the chartPanel with the JFreeChart inside to JPanel2
 				jpanel2.add(chartPanel);
 				jpanel2.setVisible(true);
-
-//				//adding checkboxes to jpanel3
-//				int numThreads = (int) getNumberOfThreads();
-//				checkboxes = new JCheckBox[numThreads];
-//
-//				int i;
-//				for(i=0; i<numThreads; i++){
-//					checkboxes[i] = new JCheckBox("Thread " + Integer.toString(i+1), true);
-//					checkboxes[i].addActionListener(new ActionListener(){
-//						public void actionPerformed(ActionEvent e){
-//							//remove data series here
-//							JCheckBox thisBox = (JCheckBox) e.getSource();
-//							if(thisBox.isSelected() == false){
-//								setSeriesInvisible(thisBox.getText());
-//							}
-//							else{
-//								setSeriesVisible(thisBox.getText());
-//							}
-//						}
-//					});
-//					jpanel3.add(checkboxes[i]);
-//				}
 				
 				
 				jpanel3.setVisible(true);
@@ -326,11 +293,19 @@ public class VisualGUI {
 				Thread CsDequeuerThread = new Thread(new Runnable(){
 					public void run(){
 						while(true){
-							while(criticalSectionQueue.isEmpty() == true){}
+							while(criticalSectionQueue.isEmpty() == true){
+								try{Thread.sleep(250);}
+								catch(InterruptedException e){}
+							}
 							for(int i=0; i<criticalSectionQueue.size(); i++){
 								CriticalSectionQObject qObject = criticalSectionQueue.poll();
-								if(!criticalSectionStrings.contains(qObject.task.getDescription()))
+								if(!criticalSectionStrings.contains(qObject.task.getDescription())){
+									if(criticalSectionStrings.size() == 10){
+										JOptionPane.showMessageDialog(null, "Cannot track criticalSection: " + qObject.task.getDescription() + 
+												"\nCan only track 10 critical sections");
+									}
 									criticalSectionStrings.add(qObject.task.getDescription());
+								}
 									
 								taskSeriesArray.get(qObject.index).add(qObject.task);
 							}
@@ -343,7 +318,10 @@ public class VisualGUI {
 				Thread AsDequeuerThread = new Thread(new Runnable(){
 					public void run(){
 						while(true){
-							while(activitySliceQueue.isEmpty() == true){}
+							while(activitySliceQueue.isEmpty() == true){
+								try{Thread.sleep(250);}
+								catch(InterruptedException e){}
+							}
 							for(int i=0; i<activitySliceQueue.size(); i++){
 								ActivitySlice slice = activitySliceQueue.poll();
 								if(slice.getDescription().equals("Initialized")){
@@ -503,8 +481,7 @@ public class VisualGUI {
 	
 	
 	public static void addSystemSlice(SystemSlice slice){
-		//System.out.println(slice.toString());
-		//overallSeries1.add(slice.getTime() - programStartTime, slice.getCpu());
+		System.out.println(slice.getCpu());
 	}
 	
 	
