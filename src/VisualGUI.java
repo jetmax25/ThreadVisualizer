@@ -58,6 +58,9 @@ public class VisualGUI {
 	ChartPanel chartPanel4;
 	//XYSeries[] seriesArray;
 	static ArrayList<XYSeries> seriesArraylist = new ArrayList<XYSeries>();
+	static XYSeries overallCpuSeries;
+	static XYSeries overallMemorySeries;
+	
 	//static XYSeries overallSeries1 = new XYSeries("Overall");
 	//XYSeries[] seriesArray2;
 	static ArrayList<XYSeries> seriesArraylist2 = new ArrayList<XYSeries>();
@@ -81,8 +84,10 @@ public class VisualGUI {
 	static ArrayList<String> chart4AxisLabels = new ArrayList<String>();
 	static ArrayList<String> criticalSectionStrings = new ArrayList<String>();
 	
-	NumberAxis domain1;
-	NumberAxis domain2;
+	static NumberAxis domain1;
+	static NumberAxis domain1Yaxis;
+	static NumberAxis domain2;
+	static NumberAxis domain2Yaxis;
 	NumberAxis domain3;
 	NumberAxis domain4;
 	
@@ -91,6 +96,9 @@ public class VisualGUI {
 	static XYBarRenderer renderer4;
 	
 	static long programStartTime = System.currentTimeMillis();
+	static int cpuUsageTime = 0;
+	static double minMemUsage = 100;
+	static double maxMemUsage = 0;
 	
 	public static ArrayList<VisualThread> threads = new ArrayList<VisualThread>();
 		
@@ -117,6 +125,8 @@ public class VisualGUI {
 
 				// create charts
 				chart = ChartFactory.createXYLineChart("CPU Usage", "Time", "Percentage", dataset, PlotOrientation.VERTICAL, true, true, false);
+				overallCpuSeries = new XYSeries("Overall");
+				dataset.addSeries(overallCpuSeries);
 				// create a panel to put the chart in
 				chartPanel = new ChartPanel(chart);
 				currChart = chart;
@@ -124,14 +134,20 @@ public class VisualGUI {
 				plot1 = (XYPlot) chart.getXYPlot();
 				domain1 = (NumberAxis) plot1.getDomainAxis();
 				domain1.setRange(0,10);
+				domain1Yaxis = (NumberAxis) plot1.getRangeAxis();
+				domain1Yaxis.setRange(0, 100);
 				plot1.setBackgroundPaint(Color.BLACK);
 
 
 
 				chart2 = ChartFactory.createXYLineChart("Memory Usage", "Time", "Percentage", dataset2, PlotOrientation.VERTICAL, true, true, false);
+				overallMemorySeries = new XYSeries("Overall");
+				dataset2.addSeries(overallMemorySeries);
 				plot2 = (XYPlot) chart2.getXYPlot();
 				domain2 = (NumberAxis) plot2.getDomainAxis();
 				domain2.setRange(0,10);
+				domain2Yaxis = (NumberAxis) plot2.getRangeAxis();
+				//domain2Yaxis.setRange(55, 60);
 				plot2.setBackgroundPaint(Color.BLACK);
 				
 				chart3 = ChartFactory.createScatterPlot("Thread Lifecycle", "Time", "Actions", dataset3);
@@ -179,6 +195,11 @@ public class VisualGUI {
 						jpanel2.revalidate();
 						jpanel2.repaint();
 						currChart = chart;
+						
+						jpanel3.setVisible(false);
+						jpanel3.revalidate();
+						jpanel3.repaint();
+						
 					}
 				});
 
@@ -193,6 +214,11 @@ public class VisualGUI {
 						jpanel2.revalidate();
 						jpanel2.repaint();
 						currChart = chart2;
+						
+						jpanel3.setVisible(false);
+						jpanel3.revalidate();
+						jpanel3.repaint();
+						
 					}
 				});
 
@@ -205,6 +231,10 @@ public class VisualGUI {
 						jpanel2.revalidate();
 						jpanel2.repaint();
 						currChart = chart3;
+						
+						jpanel3.setVisible(true);
+						jpanel3.revalidate();
+						jpanel3.repaint();
 					}
 				});
 
@@ -217,6 +247,10 @@ public class VisualGUI {
 						jpanel2.revalidate();
 						jpanel2.repaint();
 						currChart = chart4;
+						
+						jpanel3.setVisible(true);
+						jpanel3.revalidate();
+						jpanel3.repaint();
 					}
 				});
 
@@ -245,7 +279,7 @@ public class VisualGUI {
 				jpanel2.setVisible(true);
 				
 				
-				jpanel3.setVisible(true);
+				jpanel3.setVisible(false);
 
 
 				//Adding components to JFrame using GridBagLayout manager
@@ -346,32 +380,6 @@ public class VisualGUI {
 				});
 				AsDequeuerThread.start();
 				
-				
-
-				Thread thread = new Thread(new Runnable(){
-					public void run(){
-						int counter = 0;
-						int i;
-						while(true){
-							for(i=0; i<seriesArraylist.size(); i++){
-								addCpuUsage(counter, i);
-								addMemoryUsage(counter, i);
-								if(counter > 10){
-									domain1.setRange(counter-10, counter);
-									domain2.setRange(counter-10, counter);
-								}
-							}
-							counter++;
-							try{Thread.sleep(1000);}
-							catch(InterruptedException e){
-
-							}
-						}
-					}
-				});
-				thread.start();
-
-
 			}
 		});		
 
@@ -481,7 +489,29 @@ public class VisualGUI {
 	
 	
 	public static void addSystemSlice(SystemSlice slice){
-		System.out.println(slice.getCpu());
+		if(slice.getMem() < minMemUsage){
+			minMemUsage = slice.getMem() - 1;
+		}
+		
+		else if(slice.getMem() > maxMemUsage){
+			maxMemUsage = slice.getMem() + 1;
+		}
+				
+		int time = (int) Math.ceil((slice.getTime() - programStartTime)/1000);
+		if(time > cpuUsageTime){
+			System.out.println(slice.getMem());
+			overallCpuSeries.add(time, slice.getCpu());
+			overallMemorySeries.add(time, slice.getMem());
+			cpuUsageTime++;
+		}
+		
+		if(time > 10){
+			domain1.setRange(time - 10, time);
+			domain2.setRange(time-10, time);
+		}
+		
+		domain2Yaxis.setLowerBound(minMemUsage);
+		domain2Yaxis.setUpperBound(maxMemUsage);
 	}
 	
 	
@@ -546,12 +576,6 @@ public class VisualGUI {
 		
 		threads.add(newThread);
 		int threadNum = threads.size();
-		XYSeries series = new XYSeries("Thread" + Integer.toString(threadNum));
-		seriesArraylist.add(series);
-		XYSeries series2 = new XYSeries("Thread" + Integer.toString(threadNum));
-		seriesArraylist2.add(series2);
-		dataset.addSeries(series);
-		dataset2.addSeries(series2);
 		
 		createCheckbox(threadNum);
 		createChart4AxisLabels(threadNum);
