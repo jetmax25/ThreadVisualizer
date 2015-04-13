@@ -3,6 +3,8 @@ import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.awt.Rectangle;
+import java.awt.Shape;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
@@ -21,6 +23,8 @@ import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.ChartUtilities;
 import org.jfree.chart.JFreeChart;
+import org.jfree.chart.LegendItem;
+import org.jfree.chart.LegendItemCollection;
 import org.jfree.chart.axis.NumberAxis;
 import org.jfree.chart.axis.SymbolAxis;
 import org.jfree.chart.plot.PlotOrientation;
@@ -72,6 +76,10 @@ public class VisualGUI {
 	JPanel jpanel1;
 	JPanel jpanel2;
 	static JPanel jpanel3 = new JPanel();
+	//static JPanel criticalSectionsLegendPanel = new JPanel();
+	
+	LegendItemCollection chart4Legend = new LegendItemCollection();
+	Shape legendItemShape = new Rectangle(10,10);
 
 	XYPlot plot1;
 	XYPlot plot2;
@@ -101,7 +109,7 @@ public class VisualGUI {
 		
 	protected VisualGUI(){
 		dataset4 = new XYTaskDataset(data4);
-		chart4 = ChartFactory.createXYBarChart("Critical Sections", "Thread", false, "Time", dataset4, PlotOrientation.HORIZONTAL, false, true, false);
+		chart4 = ChartFactory.createXYBarChart("Critical Sections", "Thread", false, "Time", dataset4, PlotOrientation.HORIZONTAL, true, true, false);
 		
 		Thread guiThread = new Thread(new Runnable(){
 			public void run(){
@@ -136,7 +144,6 @@ public class VisualGUI {
 				domain2 = (NumberAxis) plot2.getDomainAxis();
 				domain2.setRange(0,10);
 				domain2Yaxis = (NumberAxis) plot2.getRangeAxis();
-				//domain2Yaxis.setRange(55, 60);
 				plot2.setBackgroundPaint(Color.BLACK);
 				
 				chart3 = ChartFactory.createScatterPlot("Thread Lifecycle", "Time", "Actions", dataset3);
@@ -237,6 +244,8 @@ public class VisualGUI {
 						jpanel2.repaint();
 						currChart = chart4;
 						
+						//jpanel3.add(criticalSectionsLegendPanel);
+						
 						jpanel3.setVisible(true);
 						jpanel3.revalidate();
 						jpanel3.repaint();
@@ -328,6 +337,10 @@ public class VisualGUI {
 												"\nCan only track 10 critical sections");
 									}
 									criticalSectionStrings.add(qObject.task.getDescription());
+									//addLegendItem(criticalSectionStrings.size());
+									chart4Legend.add(new LegendItem("CriticalSection: "+criticalSectionStrings.get(criticalSectionStrings.size()-1), null, null, null,
+											legendItemShape, CriticalSectionsBarRenderer.colors[criticalSectionStrings.size()-1]));
+									plot4.setFixedLegendItems(chart4Legend);
 								}
 									
 								taskSeriesArray.get(qObject.index).add(qObject.task);
@@ -389,6 +402,7 @@ public class VisualGUI {
 		return Analyzer.threadCount();
 		//return 3;
 	}
+		
 	
 	private static void createCheckbox(int threadNumber){
 		JCheckBox newCheckBox = new JCheckBox("Thread " + threadNumber, true);
@@ -476,7 +490,7 @@ public class VisualGUI {
 				
 		int time = (int) Math.ceil((slice.getTime() - programStartTime)/1000);
 		if(time > cpuUsageTime){
-			System.out.println(slice.getMem());
+			//System.out.println(slice.getMem());
 			overallCpuSeries.add(time, slice.getCpu());
 			overallMemorySeries.add(time, slice.getMem());
 			cpuUsageTime++;
@@ -522,7 +536,7 @@ public class VisualGUI {
 	
 	
 	//returns -1 if thread with given id does not exist
-	public static int getTaskSeriesID(long id){
+	private static int getTaskSeriesID(long id){
 		for(int i=0; i<threads.size(); i++){
 			VisualThread thisThread = threads.get(i);
 			if(thisThread.getId() == id)
