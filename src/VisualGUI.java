@@ -36,7 +36,7 @@ import org.jfree.data.xy.XYSeriesCollection;
 
 
 public class VisualGUI {
-	static int threadCount=0;
+	static boolean isFirstThread = true;
 	
 	static ConcurrentLinkedQueue<CriticalSectionQObject> criticalSectionQueue = new ConcurrentLinkedQueue<CriticalSectionQObject>();
 	static ConcurrentLinkedQueue<ActivitySlice> activitySliceQueue = new ConcurrentLinkedQueue<ActivitySlice>();
@@ -113,14 +113,6 @@ public class VisualGUI {
 	
 				
 				System.out.printf("numThreads: %d\n", (int)getNumberOfThreads());												
-				
-				// create datasets
-				//dataset = new XYSeriesCollection();	
-
-				//dataset2 = new XYSeriesCollection();
-
-				//data4 = new TaskSeriesCollection();
-				//dataset4 = new XYTaskDataset(data4);
 				
 
 				// create charts
@@ -568,10 +560,10 @@ public class VisualGUI {
 
 	//This method will be called by the library when the number of threads changes
 	public static void threadAdded(final VisualThread newThread){
-		if(threadCount == 0){
+		if(isFirstThread == true){
 			new VisualGUI();
 			plot4 = chart4.getXYPlot();
-			threadCount++;
+			isFirstThread = false;
 		}
 		
 		threads.add(newThread);
