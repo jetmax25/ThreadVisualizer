@@ -375,18 +375,6 @@ public class VisualGUI {
 		guiThread.start();
 	}
 
-//	public void addCpuUsage(int counter, int index){
-//		//seriesArray[index].add(counter, returnRandom());
-//		XYSeries series = seriesArraylist.get(index);
-//		series.add(counter, returnRandom());
-//		
-//	}
-//	
-//	public void addMemoryUsage(int counter, int index){
-//		//seriesArray2[index].add(counter, (returnRandom()*2)%100);
-//		XYSeries series = seriesArraylist2.get(index);
-//		series.add(counter, (returnRandom()*2)%100);
-//	}
 	
 	//This method returns a random integer
 	public static int returnRandom(){
