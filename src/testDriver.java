@@ -19,7 +19,7 @@ public class testDriver {
 			public void run(){
 				int i=0;
 				while(i<5){
-					try{Thread.sleep(VisualGUI.returnRandom()*10);}
+					try{Thread.sleep(returnRandom2()*10);}
 					catch(InterruptedException e){}
 					int rand = returnRandom();
 					if(rand == 1)
@@ -42,7 +42,7 @@ public class testDriver {
 			public void run(){
 				int i=0;
 				while(i<5){
-					try{Thread.sleep(VisualGUI.returnRandom()*10);}
+					try{Thread.sleep(returnRandom2()*10);}
 					catch(InterruptedException e){}
 					int rand = returnRandom();
 					if(rand == 1)
@@ -66,7 +66,7 @@ public class testDriver {
 			public void run(){
 				int i=0;
 				while(i<5){
-					try{Thread.sleep(VisualGUI.returnRandom()*10);}
+					try{Thread.sleep(returnRandom2()*10);}
 					catch(InterruptedException e){}
 					int rand = returnRandom();
 					if(rand == 1)
@@ -90,7 +90,7 @@ public class testDriver {
 			public void run(){
 				int i=0;
 				while(i<5){
-					try{Thread.sleep(VisualGUI.returnRandom()*10);}
+					try{Thread.sleep(returnRandom2()*10);}
 					catch(InterruptedException e){}
 					int rand = returnRandom();
 					if(rand == 1)
@@ -156,6 +156,13 @@ public class testDriver {
 	private static synchronized int returnRandom(){
 		Random rn = new Random();
 		int answer = rn.nextInt(2) + 1;
+		return answer;
+	}
+	
+	//This method returns a random integer
+	public static int returnRandom2(){
+		Random rn = new Random();
+		int answer = rn.nextInt(40) + 1;
 		return answer;
 	}
 	

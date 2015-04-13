@@ -50,16 +50,16 @@ public class VisualGUI {
 	static XYSeriesCollection dataset2 = new XYSeriesCollection();
 	static XYSeriesCollection dataset3 = new XYSeriesCollection();
 	static TaskSeriesCollection data4 = new TaskSeriesCollection();
-	XYTaskDataset dataset4;
-	JFreeChart chart; //CPU usage chart
-	JFreeChart chart2; //Memory usage chart
-	JFreeChart chart3;
+	static XYTaskDataset dataset4;
+	static JFreeChart chart; //CPU usage chart
+	static JFreeChart chart2; //Memory usage chart
+	static JFreeChart chart3;
 	static JFreeChart chart4; //Critical Section chart
 	static JFreeChart currChart; //currChart keeps track of the chart currently being displayed to the user
-	ChartPanel chartPanel;
-	ChartPanel chartPanel2;
-	ChartPanel chartPanel3;
-	ChartPanel chartPanel4;
+	static ChartPanel chartPanel;
+	static ChartPanel chartPanel2;
+	static ChartPanel chartPanel3;
+	static ChartPanel chartPanel4;
 
 	static XYSeries overallCpuSeries;
 	static XYSeries overallMemorySeries;
@@ -71,19 +71,18 @@ public class VisualGUI {
 	
 	static ArrayList<JCheckBox> checkboxes = new ArrayList<JCheckBox>();
 	
-	JFrame jframe;
-	GridBagConstraints gc;
-	JPanel jpanel1;
-	JPanel jpanel2;
+	static JFrame jframe;
+	static GridBagConstraints gc;
+	static JPanel jpanel1;
+	static JPanel jpanel2;
 	static JPanel jpanel3 = new JPanel();
-	//static JPanel criticalSectionsLegendPanel = new JPanel();
 	
-	LegendItemCollection chart4Legend = new LegendItemCollection();
-	Shape legendItemShape = new Rectangle(10,10);
+	static LegendItemCollection chart4Legend = new LegendItemCollection();
+	static Shape legendItemShape = new Rectangle(10,10);
 
-	XYPlot plot1;
-	XYPlot plot2;
-	XYPlot plot3;
+	static XYPlot plot1;
+	static XYPlot plot2;
+	static XYPlot plot3;
 	static XYPlot plot4;
 	
 	static ArrayList<String> chart4AxisLabels = new ArrayList<String>();
@@ -93,8 +92,8 @@ public class VisualGUI {
 	static NumberAxis domain1Yaxis;
 	static NumberAxis domain2;
 	static NumberAxis domain2Yaxis;
-	NumberAxis domain3;
-	NumberAxis domain4;
+	static NumberAxis domain3;
+	static NumberAxis domain4;
 	
 	static Task curTask;
 
@@ -160,8 +159,6 @@ public class VisualGUI {
 				plot4 = chart4.getXYPlot();
 				plot4.setRangeAxis(new NumberAxis("Time (Milliseconds)"));
 				plot4.setRenderer(new CriticalSectionsBarRenderer());
-			
-				//SymbolAxis symbolAxis = new SymbolAxis("Series", )
 
 				//not entirely sure why we need these three lines but its started working when I put them in
 				renderer4 = (XYBarRenderer) plot4.getRenderer();
@@ -243,9 +240,7 @@ public class VisualGUI {
 						jpanel2.revalidate();
 						jpanel2.repaint();
 						currChart = chart4;
-						
-						//jpanel3.add(criticalSectionsLegendPanel);
-						
+												
 						jpanel3.setVisible(true);
 						jpanel3.revalidate();
 						jpanel3.repaint();
@@ -337,7 +332,6 @@ public class VisualGUI {
 												"\nCan only track 10 critical sections");
 									}
 									criticalSectionStrings.add(qObject.task.getDescription());
-									//addLegendItem(criticalSectionStrings.size());
 									chart4Legend.add(new LegendItem("CriticalSection: "+criticalSectionStrings.get(criticalSectionStrings.size()-1), null, null, null,
 											legendItemShape, CriticalSectionsBarRenderer.colors[criticalSectionStrings.size()-1]));
 									plot4.setFixedLegendItems(chart4Legend);
@@ -389,13 +383,6 @@ public class VisualGUI {
 	}
 
 	
-	//This method returns a random integer
-	public static int returnRandom(){
-		Random rn = new Random();
-		int answer = rn.nextInt(40) + 1;
-		return answer;
-	}
-
 
 	//This method gets the number of threads from the library and returns it
 	private static long getNumberOfThreads(){
@@ -481,11 +468,11 @@ public class VisualGUI {
 	
 	public static void addSystemSlice(SystemSlice slice){
 		if(slice.getMem() < minMemUsage){
-			minMemUsage = slice.getMem() - 1;
+			minMemUsage = slice.getMem() - .1;
 		}
 		
 		else if(slice.getMem() > maxMemUsage){
-			maxMemUsage = slice.getMem() + 1;
+			maxMemUsage = slice.getMem() + .1;
 		}
 				
 		int time = (int) Math.ceil((slice.getTime() - programStartTime)/1000);
