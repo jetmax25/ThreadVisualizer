@@ -56,17 +56,14 @@ public class VisualGUI {
 	ChartPanel chartPanel2;
 	ChartPanel chartPanel3;
 	ChartPanel chartPanel4;
-	//XYSeries[] seriesArray;
-	static ArrayList<XYSeries> seriesArraylist = new ArrayList<XYSeries>();
+
 	static XYSeries overallCpuSeries;
 	static XYSeries overallMemorySeries;
 	
-	//static XYSeries overallSeries1 = new XYSeries("Overall");
-	//XYSeries[] seriesArray2;
+
 	static ArrayList<XYSeries> seriesArraylist2 = new ArrayList<XYSeries>();
 	static ArrayList<XYSeries> seriesArraylist3 = new ArrayList<XYSeries>();
 	static ArrayList<TaskSeries> taskSeriesArray = new ArrayList<TaskSeries>();
-	//static JCheckBox[] checkboxes; //array that hold all of the checkboxes
 	
 	static ArrayList<JCheckBox> checkboxes = new ArrayList<JCheckBox>();
 	
@@ -104,7 +101,7 @@ public class VisualGUI {
 		
 	protected VisualGUI(){
 		dataset4 = new XYTaskDataset(data4);
-		chart4 = ChartFactory.createXYBarChart("Critical Sections", "Thread", false, "Time", dataset4, PlotOrientation.HORIZONTAL, true, true, false);
+		chart4 = ChartFactory.createXYBarChart("Critical Sections", "Thread", false, "Time", dataset4, PlotOrientation.HORIZONTAL, false, true, false);
 		
 		Thread guiThread = new Thread(new Runnable(){
 			public void run(){
@@ -378,18 +375,18 @@ public class VisualGUI {
 		guiThread.start();
 	}
 
-	public void addCpuUsage(int counter, int index){
-		//seriesArray[index].add(counter, returnRandom());
-		XYSeries series = seriesArraylist.get(index);
-		series.add(counter, returnRandom());
-		
-	}
-	
-	public void addMemoryUsage(int counter, int index){
-		//seriesArray2[index].add(counter, (returnRandom()*2)%100);
-		XYSeries series = seriesArraylist2.get(index);
-		series.add(counter, (returnRandom()*2)%100);
-	}
+//	public void addCpuUsage(int counter, int index){
+//		//seriesArray[index].add(counter, returnRandom());
+//		XYSeries series = seriesArraylist.get(index);
+//		series.add(counter, returnRandom());
+//		
+//	}
+//	
+//	public void addMemoryUsage(int counter, int index){
+//		//seriesArray2[index].add(counter, (returnRandom()*2)%100);
+//		XYSeries series = seriesArraylist2.get(index);
+//		series.add(counter, (returnRandom()*2)%100);
+//	}
 	
 	//This method returns a random integer
 	public static int returnRandom(){
