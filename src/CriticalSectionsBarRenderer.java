@@ -11,7 +11,7 @@ import org.jfree.data.gantt.TaskSeries;
 public class CriticalSectionsBarRenderer extends XYBarRenderer {
 	
 	//Allows for 10 critical sections
-	Color[] colors = {Color.BLUE, Color.CYAN, Color.GREEN, Color.MAGENTA, Color.ORANGE, Color.PINK,
+	static Color[] colors = {Color.BLUE, Color.CYAN, Color.GREEN, Color.MAGENTA, Color.ORANGE, Color.PINK,
 						Color.RED, Color.WHITE, Color.YELLOW, Color.BLACK};
 	
 	public CriticalSectionsBarRenderer(){
