@@ -12,9 +12,7 @@ public class Analyzer {
 	private static Hashtable<Long,Thread> threadTable = new Hashtable<Long, Thread>();
 	private  static Hashtable<Long,ArrayList<ActivitySlice>> activityTable = new Hashtable<Long, ArrayList<ActivitySlice>>();
 	private static Hashtable<String, Hashtable<Long, long[]>> criticalSection = new Hashtable<String, Hashtable<Long, long[]>>();
-
 	private static ArrayList<SystemSlice> systemList = new ArrayList<SystemSlice>(); 
-
 	private static ActivitySlice lastSlice = null; 
 	//accepting thread table
 	private static Hashtable<Long,Long> acceptingTable = new Hashtable<Long, Long>();
@@ -27,9 +25,6 @@ public class Analyzer {
 	private static long start = System.currentTimeMillis(); 
 	//rate at which the Visualizer logs CPU/Memory Usage, watched variables, etc.
 	private static int tickRate = 500;
-
-	private static MethodFinder finder;
-	
 	//kicks off our data collection at every tickRate interval
 	private static ScheduledExecutorService dataService = Executors.newSingleThreadScheduledExecutor();
 	private static boolean serviceStarted = false;
@@ -44,34 +39,18 @@ public class Analyzer {
 	//Threads will call this method to add themselves to the ArrayList
 	public static void addThread(Thread th)
 	{
-		if(finder == null)
-		{
-			finder = new MethodFinder();
-			finder.start();
-		}
-		
-		finder.addThread((VisualThread) th);
-
 		threadTable.put(th.getId(), th);
 		activityTable.put(th.getId(), new ArrayList<ActivitySlice>());
 		activeThreads++;
 		
 		if(activeThreads > maxThreads) maxThreads++; 
 		totalThreads++;
-		
-		
 	}
 	
 	public static void removeThreads(Thread th)
 	{
 		threadTable.remove(th.getId());
 		activeThreads--;
-		//finder.removeThread(th);
-		
-//		if(activeThreads == 0)
-//		{
-//			finder.stop();
-//		}
 	}
 
 	public static Thread getThread(long id)
@@ -81,9 +60,6 @@ public class Analyzer {
 	
 	public static void addSlice(ActivitySlice as)
 	{
-		//System.out.println("step3");
-		
-		//get prev info
 		long num = as.getThread();
 		ArrayList<ActivitySlice> temp = activityTable.get(num);
 		
