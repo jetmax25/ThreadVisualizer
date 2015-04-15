@@ -136,7 +136,7 @@ public class VisualGUI {
 
 
 
-				chart2 = ChartFactory.createXYLineChart("Memory Usage", "Time", "Percentage", dataset2, PlotOrientation.VERTICAL, true, true, false);
+				chart2 = ChartFactory.createXYLineChart("Memory Usage", "Time", "Megabytes", dataset2, PlotOrientation.VERTICAL, true, true, false);
 				overallMemorySeries = new XYSeries("Overall");
 				dataset2.addSeries(overallMemorySeries);
 				plot2 = (XYPlot) chart2.getXYPlot();

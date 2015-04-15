@@ -17,6 +17,15 @@ public class VisualThread extends Thread{
 		super(runnable);
 		this.id = super.getId();
 		Analyzer.addThread(this);
+		VisualGUI.threadAdded(this);
+		this.addSlice("Initialized");
+	}
+	
+	public VisualThread(Runnable runnable, String string){
+		super(runnable, string);
+		this.id = super.getId();
+		Analyzer.addThread(this);
+		VisualGUI.threadAdded(this);
 		this.addSlice("Initialized");
 	}
 
