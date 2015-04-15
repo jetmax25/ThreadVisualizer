@@ -1,4 +1,7 @@
 import java.util.ArrayList;
+import java.util.Collection;
+
+import com.sun.xml.internal.xsom.impl.scd.Iterators.Map;
 
 
 public class MethodFinder extends Thread {
@@ -7,45 +10,56 @@ public class MethodFinder extends Thread {
 	private static ArrayList<Integer> stackSize;
 	private static int threadNum; 
 	
-	private MethodFinder()
+	public MethodFinder()
 	{
 		threads = new ArrayList<VisualThread>();
 		stackSize = new ArrayList<Integer>();
-		threadNum = 0; 
 	}
 	
-	public static void addThread(VisualThread thread)
+	public void addThread(VisualThread thread)
 	{
-		threads.add(thread);
-		stackSize.add(thread.getStackTrace().length);
+		//if(threadNum < 0) threadNum++;
+		//threads.add(thread);
+		//stackSize.add(thread.stackTraceSize());
+		java.util.Map<Thread, StackTraceElement[]> map =  Thread.getAllStackTraces();
+		Collection<StackTraceElement[]> p = map.values();
+
+		
+		System.out.println(p.iterator());
 	}
 	
-	public static void removeThread(VisualThread thread)
+	public void removeThread(VisualThread thread)
 	{
 		int remove = threads.indexOf(thread);
 		threads.remove(remove);
-		stackSize.remove(remove);
+		
 	}
 	
 	public void run()
 	{
+		
 		while(true)
 		{
-			checkMethods(threads.get(threadNum));
-			threadNum %= threads.size();
+			//System.out.println("running");
+			if(threadNum < 0) continue;
+			
+		//	System.out.println("running");
+		//	checkMethods(threads.get(threadNum));
+		//	threadNum++;
+		//	threadNum %= threads.size();
 		}
 	}
 	
-	private static void checkMethods(VisualThread thread)
+	private void checkMethods(VisualThread thread)
 	{
-		if(thread.getStackTrace().length > stackSize.get(threadNum))
-		{
-			System.out.println(thread.getStackTrace()[1]);
-		}
+		//if(thread.getStackTrace().length > stackSize.get(threadNum))
+		//{
+			System.out.println("asdf" + thread.getStackTrace());
+		//}
 		
-		else {
+		//else {
 			stackSize.set(threadNum, thread.getStackTrace().length);  
-		}
+		//}
 	}
 	
 	

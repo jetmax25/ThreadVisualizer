@@ -151,7 +151,11 @@ public class VisualThread extends Thread{
 	{
 		Analyzer.leavingCriticalSection(this.id, section, System.currentTimeMillis());
 	}
-	
+	 
+	public int stackTraceSize()
+	{
+		return Thread.currentThread().getStackTrace().length -1;
+	}
 }
 
 

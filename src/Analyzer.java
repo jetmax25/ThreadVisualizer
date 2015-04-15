@@ -25,10 +25,10 @@ public class Analyzer {
 	//most threads ever active
 	private static int maxThreads  = 0; 
 	private static long start = System.currentTimeMillis(); 
-	
 	//rate at which the Visualizer logs CPU/Memory Usage, watched variables, etc.
 	private static int tickRate = 500;
 
+	private static MethodFinder finder;
 	
 	//kicks off our data collection at every tickRate interval
 	private static ScheduledExecutorService dataService = Executors.newSingleThreadScheduledExecutor();
@@ -44,7 +44,14 @@ public class Analyzer {
 	//Threads will call this method to add themselves to the ArrayList
 	public static void addThread(Thread th)
 	{
+		if(finder == null)
+		{
+			finder = new MethodFinder();
+			finder.start();
+		}
 		
+		finder.addThread((VisualThread) th);
+
 		threadTable.put(th.getId(), th);
 		activityTable.put(th.getId(), new ArrayList<ActivitySlice>());
 		activeThreads++;
@@ -52,12 +59,19 @@ public class Analyzer {
 		if(activeThreads > maxThreads) maxThreads++; 
 		totalThreads++;
 		
+		
 	}
 	
 	public static void removeThreads(Thread th)
 	{
 		threadTable.remove(th.getId());
 		activeThreads--;
+		//finder.removeThread(th);
+		
+//		if(activeThreads == 0)
+//		{
+//			finder.stop();
+//		}
 	}
 
 	public static Thread getThread(long id)
